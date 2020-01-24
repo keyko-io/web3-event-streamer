@@ -1,11 +1,11 @@
-package com.keyko.streamer;
+package io.keyko.monitoring;
 
-import com.keyko.streamer.config.StreamerConfig;
-import com.keyko.streamer.stream.EventStreamManager;
+import io.keyko.monitoring.config.StreamerConfig;
+import io.keyko.monitoring.stream.EventStreamManager;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 
-public class KeykoStreamer {
+public class KeykoMonitoring {
 
     public static void main(final String[] args) throws Exception {
 

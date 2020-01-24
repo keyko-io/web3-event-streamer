@@ -1,4 +1,4 @@
-package com.keyko.streamer.serde;
+package io.keyko.monitoring.serde;
 
 import io.confluent.kafka.streams.serdes.avro.SpecificAvroSerde;
 import net.consensys.eventeum.BlockEvent;

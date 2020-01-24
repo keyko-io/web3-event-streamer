@@ -1,4 +1,4 @@
-package com.keyko.streamer.serde;
+package io.keyko.monitoring.serde;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.kafka.common.errors.SerializationException;

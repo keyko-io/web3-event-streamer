@@ -1,6 +1,6 @@
-package com.keyko.streamer;
+package io.keyko.monitoring;
 
-import com.keyko.streamer.stream.EventProcessor;
+import io.keyko.monitoring.stream.EventProcessor;
 import io.confluent.kafka.serializers.AbstractKafkaAvroSerDeConfig;
 import io.confluent.kafka.streams.serdes.avro.SpecificAvroSerde;
 import net.consensys.eventeum.*;
@@ -14,10 +14,7 @@ import org.apache.kafka.streams.kstream.KTable;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 
@@ -70,8 +67,10 @@ public class EventProcessorTest {
         config.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.StringSerde.class);
         config.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, SpecificAvroSerde.class);
         config.put(AbstractKafkaAvroSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, MOCK_SCHEMA_REGISTRY_URL);
-        Map<String, String> conf = Map.of(
-                AbstractKafkaAvroSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, MOCK_SCHEMA_REGISTRY_URL);
+
+        Map<String, String> conf = new HashMap();
+        conf.put( AbstractKafkaAvroSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, MOCK_SCHEMA_REGISTRY_URL);
+
         eventAvroSerde.configure(conf, false);
         blockAvroSerde.configure(conf, false);
         eventBlockAvroSerde.configure(conf, false);

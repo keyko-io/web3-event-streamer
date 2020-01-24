@@ -1,7 +1,9 @@
-package com.keyko.streamer.stream;
+package io.keyko.monitoring.stream;
 
-import com.keyko.streamer.config.StreamerConfig;
-import com.keyko.streamer.serde.EventSerdes;
+import io.keyko.monitoring.config.StreamerConfig;
+import io.keyko.monitoring.model.AccountCreatedAggregation;
+import io.keyko.monitoring.serde.EventSerdes;
+import io.keyko.monitoring.serde.JsonPOJOSerde;
 import io.confluent.kafka.serializers.AbstractKafkaAvroSerDeConfig;
 import net.consensys.eventeum.BlockEvent;
 import net.consensys.eventeum.ContractEvent;
@@ -14,10 +16,9 @@ import org.apache.kafka.streams.StreamsConfig;
 import org.apache.kafka.streams.kstream.Consumed;
 import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.KTable;
+import org.apache.kafka.streams.kstream.Produced;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 
 public class EventStreamManager implements EventSerdes {
 
@@ -78,11 +79,8 @@ public class EventStreamManager implements EventSerdes {
                         configuration.getSchemaRegistryUrl());
 
 
-//        final SpecificAvroSerde<ContractEvent> eventAvroSerde = new SpecificAvroSerde<>();
         eventAvroSerde.configure(serdeConfig, false);
-//        final SpecificAvroSerde<BlockEvent> blockAvroSerde = new SpecificAvroSerde<BlockEvent>();
         blockAvroSerde.configure(serdeConfig, false);
-//        final SpecificAvroSerde<EventBlock> eventBlockAvroSerde = new SpecificAvroSerde<>();
         eventBlockAvroSerde.configure(serdeConfig, false);
 
 
@@ -92,25 +90,14 @@ public class EventStreamManager implements EventSerdes {
 
         final KTable<String, BlockEvent> blockAvroStream = builder.table(configuration.getBlockEventTopic(), Consumed.with(Serdes.String(), blockAvroSerde));
 
-
         KStream<String, EventBlock> eventBlockStream = eventProcessor.joinEventWithBlock(eventAvroStream, blockAvroStream, eventAvroSerde, blockAvroSerde);
 
         eventProcessor.splitTopics(eventBlockStream, eventBlockAvroSerde);
 
 
-        final KStream<String, EventBlock> valSigAvroStream =
-                builder
-                        .stream("validatorsignerauthorized", Consumed.with(Serdes.String(), eventBlockAvroSerde))
-                        .filter((key, event) -> event.getDetails().getStatus().toString().equalsIgnoreCase("CONFIRMED"));
-
-
-        valSigAvroStream.mapValues(event -> {
-
-            String id = event.getId();
-            System.out.println("Validator Signed Event");
-            return event;
-        });
-
+        List<String> accountsTopics = Arrays.asList("AccountCreated".toLowerCase(), "ValidatorSignerAuthorized".toLowerCase());//, "VoteSignerAuthorized".toLowerCase(), "AttestationSignerAuthorized".toLowerCase());
+        KStream<String, AccountCreatedAggregation> accountsCreatedDayStream =  eventProcessor.accountDailyAggregation(accountsTopics, builder, eventBlockAvroSerde);
+        accountsCreatedDayStream.to(configuration.getAccountsAggregationTopic(), Produced.with(Serdes.String(), new JsonPOJOSerde<AccountCreatedAggregation>(AccountCreatedAggregation.class)));
 
         return new KafkaStreams(builder.build(), this.getStreamConfiguration());
 
