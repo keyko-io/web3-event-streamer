@@ -1,8 +1,8 @@
 package com.keyko.streamer.stream;
 
 import com.keyko.streamer.config.StreamerConfig;
+import com.keyko.streamer.serde.EventSerdes;
 import io.confluent.kafka.serializers.AbstractKafkaAvroSerDeConfig;
-import io.confluent.kafka.streams.serdes.avro.SpecificAvroSerde;
 import net.consensys.eventeum.BlockEvent;
 import net.consensys.eventeum.ContractEvent;
 import net.consensys.eventeum.EventBlock;
@@ -11,18 +11,19 @@ import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.StreamsConfig;
-import org.apache.kafka.streams.kstream.*;
+import org.apache.kafka.streams.kstream.Consumed;
+import org.apache.kafka.streams.kstream.KStream;
+import org.apache.kafka.streams.kstream.KTable;
 
 import java.util.Collections;
 import java.util.Map;
 import java.util.Properties;
 
-public class EventStreamManager {
+public class EventStreamManager implements EventSerdes {
 
     private StreamerConfig configuration;
     private static final Integer DEFAULT_THREADS = 1;
     private static final Integer DEFAULT_REPLICATION_FACTOR = 1;
-
 
 
     public EventStreamManager(StreamerConfig streamerConfig) {
@@ -69,6 +70,7 @@ public class EventStreamManager {
     private KafkaStreams createStreams() {
 
         final StreamsBuilder builder = new StreamsBuilder();
+        EventProcessor eventProcessor = new EventProcessor();
 
 
         final Map<String, String> serdeConfig =
@@ -76,57 +78,36 @@ public class EventStreamManager {
                         configuration.getSchemaRegistryUrl());
 
 
-        final SpecificAvroSerde<ContractEvent> eventAvroSerde = new SpecificAvroSerde<>();
+//        final SpecificAvroSerde<ContractEvent> eventAvroSerde = new SpecificAvroSerde<>();
         eventAvroSerde.configure(serdeConfig, false);
-        final KStream<String, ContractEvent> eventAvroStream =
-                builder
-                        .stream(configuration.getContractEventTopic(), Consumed.with(Serdes.String(), eventAvroSerde))
-                        .filter ((key, event) -> event.getDetails().getStatus().toString().equalsIgnoreCase("CONFIRMED"));
-
-        final SpecificAvroSerde<BlockEvent> blockAvroSerde = new SpecificAvroSerde<BlockEvent>();
+//        final SpecificAvroSerde<BlockEvent> blockAvroSerde = new SpecificAvroSerde<BlockEvent>();
         blockAvroSerde.configure(serdeConfig, false);
+//        final SpecificAvroSerde<EventBlock> eventBlockAvroSerde = new SpecificAvroSerde<>();
+        eventBlockAvroSerde.configure(serdeConfig, false);
+
+
+        KStream<String, ContractEvent> contractEvents = builder.stream(configuration.getContractEventTopic(), Consumed.with(Serdes.String(), eventAvroSerde));
+
+        final KStream<String, ContractEvent> eventAvroStream = eventProcessor.filterConfirmed(contractEvents);
+
         final KTable<String, BlockEvent> blockAvroStream = builder.table(configuration.getBlockEventTopic(), Consumed.with(Serdes.String(), blockAvroSerde));
 
 
-        KStream<String, EventBlock> eventBlockStream = eventAvroStream
-                .selectKey((key, event) -> event.getDetails().getBlockHash())
-                .join(blockAvroStream,
-                        (event, block) -> {
-                            EventBlock eventblock = new EventBlock();
+        KStream<String, EventBlock> eventBlockStream = eventProcessor.joinEventWithBlock(eventAvroStream, blockAvroStream, eventAvroSerde, blockAvroSerde);
 
-                            eventblock.setDetails(event.getDetails());
-                            eventblock.setDetailsBlock(block.getDetails());
-                            eventblock.setId(event.getId());
-                            eventblock.setRetries(event.getRetries());
-                            eventblock.setType(event.getType());
-
-                            return eventblock;
-                        },
-                        Joined.with(Serdes.String(), eventAvroSerde, blockAvroSerde)
-                )
-                .selectKey( (key, event) -> event.getId());
-
-
-        final SpecificAvroSerde<EventBlock> eventBlockAvroSerde = new SpecificAvroSerde<>();
-        eventBlockAvroSerde.configure(serdeConfig, false);
-
-        eventBlockStream.to( (key, value, recordContext) ->
-                        value.getDetails().getName().toLowerCase() + "_avro",
-                Produced.with(Serdes.String(), eventBlockAvroSerde)
-        );
+        eventProcessor.splitTopics(eventBlockStream, eventBlockAvroSerde);
 
 
         final KStream<String, EventBlock> valSigAvroStream =
                 builder
-                        .stream("validatorsignerauthorized_avro", Consumed.with(Serdes.String(), eventBlockAvroSerde))
-                        .filter ((key, event) -> event.getDetails().getStatus().toString().equalsIgnoreCase("CONFIRMED"));
+                        .stream("validatorsignerauthorized", Consumed.with(Serdes.String(), eventBlockAvroSerde))
+                        .filter((key, event) -> event.getDetails().getStatus().toString().equalsIgnoreCase("CONFIRMED"));
 
 
-
-        valSigAvroStream.mapValues( event -> {
+        valSigAvroStream.mapValues(event -> {
 
             String id = event.getId();
-            System.out.println("VAlidator Signed Event");
+            System.out.println("Validator Signed Event");
             return event;
         });
 
