@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.example</groupId>
+    <groupId>io.keyko.monitoring</groupId>
     <artifactId>keyko-event-streamer</artifactId>
     <version>0.0.1</version>
     <inceptionYear>2019</inceptionYear>
@@ -129,7 +129,7 @@
                                 <transformer
                                         implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <manifestEntries>
-                                        <Main-Class>com.keyko.streamer.KeykoStreamer</Main-Class>
+                                        <Main-Class>io.keyko.monitoring.KeykoMonitoring</Main-Class>
                                     </manifestEntries>
                                 </transformer>
                             </transformers>
