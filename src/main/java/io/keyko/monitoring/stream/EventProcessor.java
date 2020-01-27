@@ -6,12 +6,14 @@ import io.keyko.monitoring.windows.DailyTimeWindows;
 import net.consensys.eventeum.BlockEvent;
 import net.consensys.eventeum.ContractEvent;
 import net.consensys.eventeum.EventBlock;
+import net.consensys.eventeum.StringParameter;
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.common.utils.Bytes;
 import org.apache.kafka.streams.KeyValue;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.kstream.*;
+import org.apache.kafka.streams.state.KeyValueStore;
 import org.apache.kafka.streams.state.WindowStore;
 
 import java.time.Duration;
@@ -146,4 +148,30 @@ public class EventProcessor {
       });
 
   }
+  /**
+   * @param validatorAffiliated Stream with the events emitted when a validator is affiliated to a validatorGroup
+   * @return
+   */
+  public KTable<Long, Long> validatorPerValidatorGroupAggregation(KStream<String, EventBlock> validatorRegistered, KStream<String, EventBlock> validatorGroupRegistered, KStream<String, EventBlock> validatorAffiliated) {
+//    KTable<String, Long> total =
+//      validatorRegistered
+//      .selectKey((k,v)->v.getDetails().getName())
+//      .groupByKey()
+//      .count(Materialized.as("total"));
+
+    return validatorAffiliated
+      .selectKey((key, event) -> ((StringParameter) event.getDetails().getIndexedParameters().get(1)).getValue())
+      .groupByKey()
+      .count()
+      .groupBy(new KeyValueMapper<String, Long, KeyValue<Long, Long>>() {
+        @Override
+        public KeyValue<Long, Long> apply(String s, Long aLong) {
+          return new KeyValue(aLong, 0L);
+        }
+      }, Grouped.with(Serdes.Long(), Serdes.Long()))
+      .count()
+      ;
+  }
+
+
 }

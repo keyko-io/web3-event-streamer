@@ -4,10 +4,7 @@ import io.confluent.kafka.serializers.AbstractKafkaAvroSerDeConfig;
 import io.confluent.kafka.streams.serdes.avro.SpecificAvroSerde;
 import io.keyko.monitoring.stream.EventProcessor;
 import net.consensys.eventeum.*;
-import org.apache.kafka.common.serialization.Serde;
-import org.apache.kafka.common.serialization.Serdes;
-import org.apache.kafka.common.serialization.StringDeserializer;
-import org.apache.kafka.common.serialization.StringSerializer;
+import org.apache.kafka.common.serialization.*;
 import org.apache.kafka.streams.*;
 import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.KTable;
@@ -53,6 +50,78 @@ public class EventProcessorTest {
 
   public EventBlock oracleReportedEventWithBlock = new EventBlock("0x27bc3eda4e3eaae838dd44f4a9fd4564f4455c51e336daa4232afd4ea190f0f1-0x73090d8e7bb7b2a2b550474c2c90e8059d9bfdcd752c5fc55af18f54debfb88d-0", "", oracleReportedDetails, blockOracleReportedDetails, 0);
 
+  public ContractEventDetails validatorRegisteredDetails = new ContractEventDetails("ValidatorRegistered", "ValidatorRegistered", "default",
+    Collections.singletonList(new StringParameter("validator", "address", "validator1")),
+    Arrays.asList(new StringParameter("ecdsaPublicKey","bytes","0123"),new StringParameter("blsPublicKey","bytes","0123")), "0x294d73910e7c1e7cd8f0bf341e513c0269a089b36c22c2ac006269eb59e6e6be",
+    "0", "10", "0x8ce40858181dccf410331c4b3edf0187ac7b887aeb5c6e0bce2dbc09635f470b", "0xC03c31f91b893317C786AB6b6A2a6BdD61db9c55", ContractEventStatus.CONFIRMED,
+    "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef", "default",
+    "11");
+  public BlockDetails blockValidatorRegisteredDetails = new BlockDetails("10", "0x8ce40858181dccf410331c4b3edf0187ac7b887aeb5c6e0bce2dbc09635f470b", "1234", "default");
+  public EventBlock validatorRegisteredEventWithBlock = new EventBlock("11", "", validatorRegisteredDetails, blockValidatorRegisteredDetails, 0);
+
+  public ContractEventDetails validatorRegisteredDetails1 = new ContractEventDetails("ValidatorRegistered", "ValidatorRegistered", "default",
+    Collections.singletonList(new StringParameter("validator", "address", "validator2")),
+    Arrays.asList(new StringParameter("ecdsaPublicKey","bytes","0123"),new StringParameter("blsPublicKey","bytes","0123")), "0x294d73910e7c1e7cd8f0bf341e513c0269a089b36c22c2ac006269eb59e6e6be",
+    "0", "11", "0x8ce40858181dccf410331c4b3edf0187ac7b887aeb5c6e0bce2dbc09635f470b", "0xC03c31f91b893317C786AB6b6A2a6BdD61db9c55", ContractEventStatus.CONFIRMED,
+    "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef", "default",
+    "12");
+  public BlockDetails blockValidatorRegisteredDetails1 = new BlockDetails("11", "0x8ce40858181dccf410331c4b3edf0187ac7b887aeb5c6e0bce2dbc09635f470b", "1234", "default");
+  public EventBlock validatorRegisteredEventWithBlock1 = new EventBlock("12", "", validatorRegisteredDetails1, blockValidatorRegisteredDetails1, 0);
+
+
+  public ContractEventDetails validatorRegisteredDetails2 = new ContractEventDetails("ValidatorRegistered", "ValidatorRegistered", "default",
+    Collections.singletonList(new StringParameter("validator", "address", "validator3")),
+    Arrays.asList(new StringParameter("ecdsaPublicKey","bytes","0123"),new StringParameter("blsPublicKey","bytes","0123")), "0x294d73910e7c1e7cd8f0bf341e513c0269a089b36c22c2ac006269eb59e6e6be",
+    "0", "12", "0x8ce40858181dccf410331c4b3edf0187ac7b887aeb5c6e0bce2dbc09635f470b", "0xC03c31f91b893317C786AB6b6A2a6BdD61db9c55", ContractEventStatus.CONFIRMED,
+    "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef", "default",
+    "13");
+  public BlockDetails blockValidatorRegisteredDetails2 = new BlockDetails("12", "0x8ce40858181dccf410331c4b3edf0187ac7b887aeb5c6e0bce2dbc09635f470b", "1234", "default");
+  public EventBlock validatorRegisteredEventWithBlock2 = new EventBlock("13", "", validatorRegisteredDetails2, blockValidatorRegisteredDetails2, 0);
+
+  public ContractEventDetails validatorRegisteredDetails3 = new ContractEventDetails("ValidatorRegistered", "ValidatorRegistered", "default",
+    Collections.singletonList(new StringParameter("validator", "address", "validator4")),
+    Arrays.asList(new StringParameter("ecdsaPublicKey","bytes","0123"),new StringParameter("blsPublicKey","bytes","0123")), "0x294d73910e7c1e7cd8f0bf341e513c0269a089b36c22c2ac006269eb59e6e6be",
+    "0", "13", "0x8ce40858181dccf410331c4b3edf0187ac7b887aeb5c6e0bce2dbc09635f470b", "0xC03c31f91b893317C786AB6b6A2a6BdD61db9c55", ContractEventStatus.CONFIRMED,
+    "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef", "default",
+    "11");
+  public BlockDetails blockValidatorRegisteredDetails3 = new BlockDetails("13", "0x8ce40858181dccf410331c4b3edf0187ac7b887aeb5c6e0bce2dbc09635f470b", "1234", "default");
+  public EventBlock validatorRegisteredEventWithBlock3 = new EventBlock("14", "", validatorRegisteredDetails3, blockValidatorRegisteredDetails3, 0);
+
+  public ContractEventDetails validatorAffiliatedDetails = new ContractEventDetails("ValidatorAffiliated", "ValidatorAffiliated", "default",
+    Arrays.asList(new StringParameter("validator", "address", "validator1"), new StringParameter("group", "address", "VG1")),
+    Collections.emptyList(), "0x294d73910e7c1e7cd8f0bf341e513c0269a089b36c22c2ac006269eb59e6e6be",
+    "0", "20", "0x8ce40858181dccf410331c4b3edf0187ac7b887aeb5c6e0bce2dbc09635f470b", "0xC03c31f91b893317C786AB6b6A2a6BdD61db9c55", ContractEventStatus.CONFIRMED,
+    "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef", "default",
+    "1");
+  public BlockDetails blockValidatorAffiliatedDetails = new BlockDetails("20", "0x8ce40858181dccf410331c4b3edf0187ac7b887aeb5c6e0bce2dbc09635f470b", "1234", "default");
+  public EventBlock validatorAffiliatedEventWithBlock = new EventBlock("1", "", validatorAffiliatedDetails, blockValidatorAffiliatedDetails, 0);
+
+  public ContractEventDetails validatorAffiliatedDetails2 = new ContractEventDetails("ValidatorAffiliated", "ValidatorAffiliated", "default",
+    Arrays.asList(new StringParameter("validator", "address", "validator2"), new StringParameter("group", "address", "VG1")),
+    Collections.emptyList(), "0x294d73910e7c1e7cd8f0bf341e513c0269a089b36c22c2ac006269eb59e6e6be",
+    "0", "21", "0x8ce40858181dccf410331c4b3edf0187ac7b887aeb5c6e0bce2dbc09635f470c", "0xC03c31f91b893317C786AB6b6A2a6BdD61db9c55", ContractEventStatus.CONFIRMED,
+    "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef", "default",
+    "2");
+  public BlockDetails blockValidatorAffiliatedDetails2 = new BlockDetails("21", "0x8ce40858181dccf410331c4b3edf0187ac7b887aeb5c6e0bce2dbc09635f470c", "1234", "default");
+  public EventBlock validatorAffiliatedEventWithBlock2 = new EventBlock("2", "", validatorAffiliatedDetails2, blockValidatorAffiliatedDetails2, 0);
+
+  public ContractEventDetails validatorAffiliatedDetails3 = new ContractEventDetails("ValidatorAffiliated", "ValidatorAffiliated", "default",
+    Arrays.asList(new StringParameter("validator", "address", "validator3"), new StringParameter("group", "address", "VG2")),
+    Collections.emptyList(), "0x294d73910e7c1e7cd8f0bf341e513c0269a089b36c22c2ac006269eb59e6e6be",
+    "0", "22", "0x8ce40858181dccf410331c4b3edf0187ac7b887aeb5c6e0bce2dbc09635f470d", "0xC03c31f91b893317C786AB6b6A2a6BdD61db9c55", ContractEventStatus.CONFIRMED,
+    "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef", "default",
+    "3");
+  public BlockDetails blockValidatorAffiliatedDetails3 = new BlockDetails("22", "0x8ce40858181dccf410331c4b3edf0187ac7b887aeb5c6e0bce2dbc09635f470d", "1234", "default");
+  public EventBlock validatorAffiliatedEventWithBlock3 = new EventBlock("3", "", validatorAffiliatedDetails3, blockValidatorAffiliatedDetails3, 0);
+
+  public ContractEventDetails validatorAffiliatedDetails4 = new ContractEventDetails("ValidatorAffiliated", "ValidatorAffiliated", "default",
+    Arrays.asList(new StringParameter("validator", "address", "validator4"), new StringParameter("group", "address", "VG1")),
+    Collections.emptyList(), "0x294d73910e7c1e7cd8f0bf341e513c0269a089b36c22c2ac006269eb59e6e6be",
+    "0", "23", "0x8ce40858181dccf410331c4b3edf0187ac7b887aeb5c6e0bce2dbc09635f470e", "0xC03c31f91b893317C786AB6b6A2a6BdD61db9c55", ContractEventStatus.CONFIRMED,
+    "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef", "default",
+    "4");
+  public BlockDetails blockValidatorAffiliatedDetails4 = new BlockDetails("23", "0x8ce40858181dccf410331c4b3edf0187ac7b887aeb5c6e0bce2dbc09635f470e", "1234", "default");
+  public EventBlock validatorAffiliatedEventWithBlock4 = new EventBlock("4", "", validatorAffiliatedDetails4, blockValidatorAffiliatedDetails4, 0);
 
   final Serde<ContractEvent> eventAvroSerde = new SpecificAvroSerde<>();
   final Serde<BlockEvent> blockAvroSerde = new SpecificAvroSerde<BlockEvent>();
@@ -120,5 +189,42 @@ public class EventProcessorTest {
     assertEquals(transferTopic.readValue().getId(), transferEventWithBlock.getId());
     assertEquals(oracleReportedTopic.readValue().getId(), oracleReportedEventWithBlock.getId());
     driver.close();
+  }
+
+  @Test
+  public void validatorPerValidationGroup() {
+    KStream<String, EventBlock> validatorRegistered = builder.stream("validatorregistered");
+    KStream<String, EventBlock> validatorGroupRegistered = builder.stream("validatorgroupregistered");
+    KStream<String, EventBlock> validatorAffiliated = builder.stream("validatoraffiliated");
+
+    new EventProcessor().validatorPerValidatorGroupAggregation(validatorRegistered, validatorGroupRegistered, validatorAffiliated).toStream().to("validatoraffiliatedaggregation");
+    Topology topology = builder.build();
+    TopologyTestDriver driver = new TopologyTestDriver(topology, config);
+    TestInputTopic<String, EventBlock> inputTopicValidatorRegistered = driver.createInputTopic("validatorregistered", new StringSerializer(), eventBlockAvroSerde.serializer());
+    TestInputTopic<String, EventBlock> inputTopicValidatorgroupregistered = driver.createInputTopic("validatorgroupregistered", new StringSerializer(), eventBlockAvroSerde.serializer());
+    TestInputTopic<String, EventBlock> inputTopicValidatoraffiliated = driver.createInputTopic("validatoraffiliated", new StringSerializer(), eventBlockAvroSerde.serializer());
+
+    inputTopicValidatorRegistered.pipeInput(validatorRegisteredEventWithBlock.getId(), validatorRegisteredEventWithBlock);
+    inputTopicValidatorRegistered.pipeInput(validatorRegisteredEventWithBlock1.getId(), validatorRegisteredEventWithBlock1);
+    inputTopicValidatorRegistered.pipeInput(validatorRegisteredEventWithBlock2.getId(), validatorRegisteredEventWithBlock2);
+    inputTopicValidatorRegistered.pipeInput(validatorRegisteredEventWithBlock3.getId(), validatorRegisteredEventWithBlock3);
+
+    inputTopicValidatoraffiliated.pipeInput(validatorAffiliatedEventWithBlock.getId(), validatorAffiliatedEventWithBlock);
+    inputTopicValidatoraffiliated.pipeInput(validatorAffiliatedEventWithBlock2.getId(), validatorAffiliatedEventWithBlock2);
+    inputTopicValidatoraffiliated.pipeInput(validatorAffiliatedEventWithBlock3.getId(), validatorAffiliatedEventWithBlock3);
+    inputTopicValidatoraffiliated.pipeInput(validatorAffiliatedEventWithBlock4.getId(), validatorAffiliatedEventWithBlock4);
+
+    TestOutputTopic<Long, Long> aggregationTestOutputTopic = driver.createOutputTopic("validatoraffiliatedaggregation", new LongDeserializer(), new LongDeserializer());
+    System.out.println(aggregationTestOutputTopic.readKeyValue());
+    System.out.println(aggregationTestOutputTopic.readKeyValue());
+    System.out.println(aggregationTestOutputTopic.readKeyValue());
+    System.out.println(aggregationTestOutputTopic.readKeyValue());
+    System.out.println(aggregationTestOutputTopic.readKeyValue());
+    System.out.println(aggregationTestOutputTopic.readKeyValue());
+//    System.out.println(table.queryableStoreName());
+//    assertEquals(Optional.ofNullable(aggregationTestOutputTopic.readValue()), 1);
+    driver.close();
+
+
   }
 }
