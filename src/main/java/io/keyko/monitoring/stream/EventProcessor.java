@@ -19,7 +19,6 @@ import java.time.Duration;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static org.apache.kafka.streams.kstream.Suppressed.BufferConfig.unbounded;
@@ -176,10 +175,10 @@ public class EventProcessor {
   /**
    * Release an alert when there are not new validators in the last 10 minutes.
    *
-   * @param builder Stream builder
+   * @param builder                  Stream builder
    * @param validatorRegisteredTopic List with the topic name to subscribe to get the validatorRegistered
-   * @param eventBlockAvroSerde Serde for the eventBlock type.
-   * @param duration Duration od the window
+   * @param eventBlockAvroSerde      Serde for the eventBlock type.
+   * @param duration                 Duration od the window
    */
   public void alertNoNewValidatorsInTime(StreamsBuilder builder, List<String> validatorRegisteredTopic, Serde<EventBlock> eventBlockAvroSerde, Long duration) {
     builder.stream(validatorRegisteredTopic, Consumed.with(Serdes.String(), eventBlockAvroSerde)
@@ -192,6 +191,7 @@ public class EventProcessor {
       .toStream()
       .foreach((x, y) -> System.out.println("ERROR, no new validators"));
   }
+
 
   private List<String> listWithValidatorGroupsRegistered(KStream<String, EventBlock> validatorGroupRegistered) {
     List<String> zeroValidators = new ArrayList<String>();

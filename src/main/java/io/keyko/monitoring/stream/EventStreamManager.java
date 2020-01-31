@@ -100,7 +100,7 @@ public class EventStreamManager implements EventSerdes {
     accountsCreatedDayStream.to(configuration.getAccountsAggregationTopic(), Produced.with(Serdes.String(), new JsonPOJOSerde<AccountCreatedAggregation>(AccountCreatedAggregation.class)));
 
     // Duration of 10 minutes
-    eventProcessor.alertNoNewValidatorsInTime(builder, Collections.singletonList("validatorRegistered".toLowerCase()),eventBlockAvroSerde,600L);
+    eventProcessor.alertNoNewValidatorsInTime(builder, Collections.singletonList("validatorRegistered".toLowerCase()), eventBlockAvroSerde, 600L);
     return new KafkaStreams(builder.build(), this.getStreamConfiguration());
 
   }

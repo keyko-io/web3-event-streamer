@@ -247,21 +247,20 @@ public class EventProcessorTest {
     inputTopicValidatoraffiliated.pipeInput(validatorAffiliatedEventWithBlock4.getId(), validatorAffiliatedEventWithBlock4);
 
     TestOutputTopic<Long, Long> aggregationTestOutputTopic = driver.createOutputTopic("validatoraffiliatedaggregation", new LongDeserializer(), new LongDeserializer());
-    System.out.println(aggregationTestOutputTopic.readKeyValue());
-    System.out.println(aggregationTestOutputTopic.readKeyValue());
-    System.out.println(aggregationTestOutputTopic.readKeyValue());
-    System.out.println(aggregationTestOutputTopic.readKeyValue());
-    System.out.println(aggregationTestOutputTopic.readKeyValue());
-    System.out.println(aggregationTestOutputTopic.readKeyValue());
-//    System.out.println(table.queryableStoreName());
-//    assertEquals(Optional.ofNullable(aggregationTestOutputTopic.readValue()), 1);
+    aggregationTestOutputTopic.readKeyValue();
+    aggregationTestOutputTopic.readKeyValue();
+    aggregationTestOutputTopic.readKeyValue();
+    assertEquals(aggregationTestOutputTopic.readKeyValue(), KeyValue.pair(1L, 1L));
+    assertEquals(aggregationTestOutputTopic.readKeyValue(), KeyValue.pair(2L, 0L));
+    assertEquals(aggregationTestOutputTopic.readKeyValue(), KeyValue.pair(3L, 1L));
+
     driver.close();
   }
 
   @Test
   public void shouldReleaseAlertWhenThereAreNoNewValidators() throws InterruptedException {
 //    KStream<String, EventBlock> validatorRegistered = builder.stream("validatorregistered");
-    new EventProcessor().alertNoNewValidatorsInTime(builder,Collections.singletonList("validatorregistered"),eventBlockAvroSerde, 1L);
+    new EventProcessor().alertNoNewValidatorsInTime(builder, Collections.singletonList("validatorregistered"), eventBlockAvroSerde, 1L);
     Topology topology = builder.build();
     TopologyTestDriver driver = new TopologyTestDriver(topology, config);
     TestInputTopic<String, EventBlock> inputTopicValidatorRegistered = driver.createInputTopic("validatorregistered", new StringSerializer(), eventBlockAvroSerde.serializer());
