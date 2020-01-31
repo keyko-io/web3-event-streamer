@@ -52,39 +52,39 @@ public class EventProcessorTest {
 
   public ContractEventDetails validatorRegisteredDetails = new ContractEventDetails("ValidatorRegistered", "ValidatorRegistered", "default",
     Collections.singletonList(new StringParameter("validator", "address", "validator1")),
-    Arrays.asList(new StringParameter("ecdsaPublicKey","bytes","0123"),new StringParameter("blsPublicKey","bytes","0123")), "0x294d73910e7c1e7cd8f0bf341e513c0269a089b36c22c2ac006269eb59e6e6be",
+    Arrays.asList(new StringParameter("ecdsaPublicKey", "bytes", "0123"), new StringParameter("blsPublicKey", "bytes", "0123")), "0x294d73910e7c1e7cd8f0bf341e513c0269a089b36c22c2ac006269eb59e6e6be",
     "0", "10", "0x8ce40858181dccf410331c4b3edf0187ac7b887aeb5c6e0bce2dbc09635f470b", "0xC03c31f91b893317C786AB6b6A2a6BdD61db9c55", ContractEventStatus.CONFIRMED,
     "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef", "default",
     "11");
-  public BlockDetails blockValidatorRegisteredDetails = new BlockDetails("10", "0x8ce40858181dccf410331c4b3edf0187ac7b887aeb5c6e0bce2dbc09635f470b", "1234", "default");
+  public BlockDetails blockValidatorRegisteredDetails = new BlockDetails("10", "0x8ce40858181dccf410331c4b3edf0187ac7b887aeb5c6e0bce2dbc09635f470b", "1578754338", "default");
   public EventBlock validatorRegisteredEventWithBlock = new EventBlock("11", "", validatorRegisteredDetails, blockValidatorRegisteredDetails, 0);
 
   public ContractEventDetails validatorRegisteredDetails1 = new ContractEventDetails("ValidatorRegistered", "ValidatorRegistered", "default",
     Collections.singletonList(new StringParameter("validator", "address", "validator2")),
-    Arrays.asList(new StringParameter("ecdsaPublicKey","bytes","0123"),new StringParameter("blsPublicKey","bytes","0123")), "0x294d73910e7c1e7cd8f0bf341e513c0269a089b36c22c2ac006269eb59e6e6be",
+    Arrays.asList(new StringParameter("ecdsaPublicKey", "bytes", "0123"), new StringParameter("blsPublicKey", "bytes", "0123")), "0x294d73910e7c1e7cd8f0bf341e513c0269a089b36c22c2ac006269eb59e6e6be",
     "0", "11", "0x8ce40858181dccf410331c4b3edf0187ac7b887aeb5c6e0bce2dbc09635f470b", "0xC03c31f91b893317C786AB6b6A2a6BdD61db9c55", ContractEventStatus.CONFIRMED,
     "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef", "default",
     "12");
-  public BlockDetails blockValidatorRegisteredDetails1 = new BlockDetails("11", "0x8ce40858181dccf410331c4b3edf0187ac7b887aeb5c6e0bce2dbc09635f470b", "1234", "default");
+  public BlockDetails blockValidatorRegisteredDetails1 = new BlockDetails("11", "0x8ce40858181dccf410331c4b3edf0187ac7b887aeb5c6e0bce2dbc09635f470b", "1578754339", "default");
   public EventBlock validatorRegisteredEventWithBlock1 = new EventBlock("12", "", validatorRegisteredDetails1, blockValidatorRegisteredDetails1, 0);
 
 
   public ContractEventDetails validatorRegisteredDetails2 = new ContractEventDetails("ValidatorRegistered", "ValidatorRegistered", "default",
     Collections.singletonList(new StringParameter("validator", "address", "validator3")),
-    Arrays.asList(new StringParameter("ecdsaPublicKey","bytes","0123"),new StringParameter("blsPublicKey","bytes","0123")), "0x294d73910e7c1e7cd8f0bf341e513c0269a089b36c22c2ac006269eb59e6e6be",
+    Arrays.asList(new StringParameter("ecdsaPublicKey", "bytes", "0123"), new StringParameter("blsPublicKey", "bytes", "0123")), "0x294d73910e7c1e7cd8f0bf341e513c0269a089b36c22c2ac006269eb59e6e6be",
     "0", "12", "0x8ce40858181dccf410331c4b3edf0187ac7b887aeb5c6e0bce2dbc09635f470b", "0xC03c31f91b893317C786AB6b6A2a6BdD61db9c55", ContractEventStatus.CONFIRMED,
     "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef", "default",
     "13");
-  public BlockDetails blockValidatorRegisteredDetails2 = new BlockDetails("12", "0x8ce40858181dccf410331c4b3edf0187ac7b887aeb5c6e0bce2dbc09635f470b", "1234", "default");
+  public BlockDetails blockValidatorRegisteredDetails2 = new BlockDetails("12", "0x8ce40858181dccf410331c4b3edf0187ac7b887aeb5c6e0bce2dbc09635f470b", "1578754340", "default");
   public EventBlock validatorRegisteredEventWithBlock2 = new EventBlock("13", "", validatorRegisteredDetails2, blockValidatorRegisteredDetails2, 0);
 
   public ContractEventDetails validatorRegisteredDetails3 = new ContractEventDetails("ValidatorRegistered", "ValidatorRegistered", "default",
     Collections.singletonList(new StringParameter("validator", "address", "validator4")),
-    Arrays.asList(new StringParameter("ecdsaPublicKey","bytes","0123"),new StringParameter("blsPublicKey","bytes","0123")), "0x294d73910e7c1e7cd8f0bf341e513c0269a089b36c22c2ac006269eb59e6e6be",
+    Arrays.asList(new StringParameter("ecdsaPublicKey", "bytes", "0123"), new StringParameter("blsPublicKey", "bytes", "0123")), "0x294d73910e7c1e7cd8f0bf341e513c0269a089b36c22c2ac006269eb59e6e6be",
     "0", "13", "0x8ce40858181dccf410331c4b3edf0187ac7b887aeb5c6e0bce2dbc09635f470b", "0xC03c31f91b893317C786AB6b6A2a6BdD61db9c55", ContractEventStatus.CONFIRMED,
     "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef", "default",
     "11");
-  public BlockDetails blockValidatorRegisteredDetails3 = new BlockDetails("13", "0x8ce40858181dccf410331c4b3edf0187ac7b887aeb5c6e0bce2dbc09635f470b", "1234", "default");
+  public BlockDetails blockValidatorRegisteredDetails3 = new BlockDetails("13", "0x8ce40858181dccf410331c4b3edf0187ac7b887aeb5c6e0bce2dbc09635f470b", "1578754341", "default");
   public EventBlock validatorRegisteredEventWithBlock3 = new EventBlock("14", "", validatorRegisteredDetails3, blockValidatorRegisteredDetails3, 0);
 
   public ContractEventDetails validatorAffiliatedDetails = new ContractEventDetails("ValidatorAffiliated", "ValidatorAffiliated", "default",
@@ -122,6 +122,34 @@ public class EventProcessorTest {
     "4");
   public BlockDetails blockValidatorAffiliatedDetails4 = new BlockDetails("23", "0x8ce40858181dccf410331c4b3edf0187ac7b887aeb5c6e0bce2dbc09635f470e", "1234", "default");
   public EventBlock validatorAffiliatedEventWithBlock4 = new EventBlock("4", "", validatorAffiliatedDetails4, blockValidatorAffiliatedDetails4, 0);
+
+  public ContractEventDetails validatorGroupRegisteredDetails = new ContractEventDetails("ValidatorGroupRegistered", "ValidatorGroupRegistered", "default",
+    Collections.singletonList(new StringParameter("group", "address", "VG1")),
+    Collections.singletonList(new NumberParameter("comission", "uint256", "12")), "0x294d73910e7c1e7cd8f0bf341e513c0269a089b36c22c2ac006269eb59e6e6be",
+    "0", "41", "0x8ce40858181dccf410331c4b3edf0187ac7b887aeb5c6e0bce2dbc09635f470e", "0xC03c31f91b893317C786AB6b6A2a6BdD61db9c55", ContractEventStatus.CONFIRMED,
+    "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef", "default",
+    "41");
+  public BlockDetails blockValidatorGroupRegisteredDetails = new BlockDetails("41", "0x8ce40858181dccf410331c4b3edf0187ac7b887aeb5c6e0bce2dbc09635f470e", "1234", "default");
+  public EventBlock validatorGroupRegisteredEventWithBlock = new EventBlock("41", "", validatorGroupRegisteredDetails, blockValidatorGroupRegisteredDetails, 0);
+
+  public ContractEventDetails validatorGroupRegisteredDetails2 = new ContractEventDetails("ValidatorGroupRegistered", "ValidatorGroupRegistered", "default",
+    Collections.singletonList(new StringParameter("group", "address", "VG2")),
+    Collections.singletonList(new NumberParameter("comission", "uint256", "12")), "0x294d73910e7c1e7cd8f0bf341e513c0269a089b36c22c2ac006269eb59e6e6be",
+    "0", "42", "0x8ce40858181dccf410331c4b3edf0187ac7b887aeb5c6e0bce2dbc09635f470e", "0xC03c31f91b893317C786AB6b6A2a6BdD61db9c55", ContractEventStatus.CONFIRMED,
+    "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef", "default",
+    "42");
+  public BlockDetails blockValidatorGroupRegisteredDetails2 = new BlockDetails("42", "0x8ce40858181dccf410331c4b3edf0187ac7b887aeb5c6e0bce2dbc09635f470e", "1234", "default");
+  public EventBlock validatorGroupRegisteredEventWithBlock2 = new EventBlock("42", "", validatorGroupRegisteredDetails2, blockValidatorGroupRegisteredDetails2, 0);
+
+  public ContractEventDetails validatorGroupRegisteredDetails3 = new ContractEventDetails("ValidatorGroupRegistered", "ValidatorGroupRegistered", "default",
+    Collections.singletonList(new StringParameter("group", "address", "VG3")),
+    Collections.singletonList(new NumberParameter("comission", "uint256", "12")), "0x294d73910e7c1e7cd8f0bf341e513c0269a089b36c22c2ac006269eb59e6e6be",
+    "0", "43", "0x8ce40858181dccf410331c4b3edf0187ac7b887aeb5c6e0bce2dbc09635f470e", "0xC03c31f91b893317C786AB6b6A2a6BdD61db9c55", ContractEventStatus.CONFIRMED,
+    "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef", "default",
+    "43");
+  public BlockDetails blockValidatorGroupRegisteredDetails3 = new BlockDetails("43", "0x8ce40858181dccf410331c4b3edf0187ac7b887aeb5c6e0bce2dbc09635f470e", "1234", "default");
+  public EventBlock validatorGroupRegisteredEventWithBlock3 = new EventBlock("43", "", validatorGroupRegisteredDetails3, blockValidatorGroupRegisteredDetails3, 0);
+
 
   final Serde<ContractEvent> eventAvroSerde = new SpecificAvroSerde<>();
   final Serde<BlockEvent> blockAvroSerde = new SpecificAvroSerde<BlockEvent>();
@@ -209,6 +237,10 @@ public class EventProcessorTest {
     inputTopicValidatorRegistered.pipeInput(validatorRegisteredEventWithBlock2.getId(), validatorRegisteredEventWithBlock2);
     inputTopicValidatorRegistered.pipeInput(validatorRegisteredEventWithBlock3.getId(), validatorRegisteredEventWithBlock3);
 
+    inputTopicValidatorgroupregistered.pipeInput(validatorGroupRegisteredEventWithBlock.getId(), validatorGroupRegisteredEventWithBlock);
+    inputTopicValidatorgroupregistered.pipeInput(validatorGroupRegisteredEventWithBlock2.getId(), validatorGroupRegisteredEventWithBlock2);
+    inputTopicValidatorgroupregistered.pipeInput(validatorGroupRegisteredEventWithBlock3.getId(), validatorGroupRegisteredEventWithBlock3);
+
     inputTopicValidatoraffiliated.pipeInput(validatorAffiliatedEventWithBlock.getId(), validatorAffiliatedEventWithBlock);
     inputTopicValidatoraffiliated.pipeInput(validatorAffiliatedEventWithBlock2.getId(), validatorAffiliatedEventWithBlock2);
     inputTopicValidatoraffiliated.pipeInput(validatorAffiliatedEventWithBlock3.getId(), validatorAffiliatedEventWithBlock3);
@@ -224,7 +256,22 @@ public class EventProcessorTest {
 //    System.out.println(table.queryableStoreName());
 //    assertEquals(Optional.ofNullable(aggregationTestOutputTopic.readValue()), 1);
     driver.close();
+  }
 
+  @Test
+  public void shouldReleaseAlertWhenThereAreNoNewValidators() throws InterruptedException {
+//    KStream<String, EventBlock> validatorRegistered = builder.stream("validatorregistered");
+    new EventProcessor().alertNoNewValidatorsInTime(builder,Collections.singletonList("validatorregistered"),eventBlockAvroSerde, 1L);
+    Topology topology = builder.build();
+    TopologyTestDriver driver = new TopologyTestDriver(topology, config);
+    TestInputTopic<String, EventBlock> inputTopicValidatorRegistered = driver.createInputTopic("validatorregistered", new StringSerializer(), eventBlockAvroSerde.serializer());
+    inputTopicValidatorRegistered.pipeInput(validatorRegisteredEventWithBlock.getId(), validatorRegisteredEventWithBlock);
+    inputTopicValidatorRegistered.pipeInput(validatorRegisteredEventWithBlock1.getId(), validatorRegisteredEventWithBlock1);
+    inputTopicValidatorRegistered.pipeInput(validatorRegisteredEventWithBlock2.getId(), validatorRegisteredEventWithBlock2);
+    inputTopicValidatorRegistered.pipeInput(validatorRegisteredEventWithBlock3.getId(), validatorRegisteredEventWithBlock3);
+
+    driver.close();
 
   }
+
 }

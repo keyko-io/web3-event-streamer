@@ -13,17 +13,20 @@ import org.apache.kafka.common.utils.Bytes;
 import org.apache.kafka.streams.KeyValue;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.kstream.*;
-import org.apache.kafka.streams.state.KeyValueStore;
 import org.apache.kafka.streams.state.WindowStore;
 
 import java.time.Duration;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.apache.kafka.streams.kstream.Suppressed.BufferConfig.unbounded;
+import static org.apache.kafka.streams.kstream.Suppressed.untilWindowCloses;
 
 public class EventProcessor {
+
 
   /**
    * Filter the events that has been already confirmed.
@@ -109,7 +112,7 @@ public class EventProcessor {
           // to allow for a 1-day window plus configured grace period
           .withRetention(Duration.ofDays(1L).plus(gracePeriod)))
         // emits the final count when the window is closed.
-        .suppress(Suppressed.untilWindowCloses(unbounded()));
+        .suppress(untilWindowCloses(unbounded()));
     ;
 
     return formatAccountCreatedAggregation(accountsCreatedDayTable, zone);
@@ -148,21 +151,18 @@ public class EventProcessor {
       });
 
   }
+
   /**
    * @param validatorAffiliated Stream with the events emitted when a validator is affiliated to a validatorGroup
    * @return
    */
   public KTable<Long, Long> validatorPerValidatorGroupAggregation(KStream<String, EventBlock> validatorRegistered, KStream<String, EventBlock> validatorGroupRegistered, KStream<String, EventBlock> validatorAffiliated) {
-//    KTable<String, Long> total =
-//      validatorRegistered
-//      .selectKey((k,v)->v.getDetails().getName())
-//      .groupByKey()
-//      .count(Materialized.as("total"));
-
+    List<String> validatorsGroupRegisteredList = listWithValidatorGroupsRegistered(validatorGroupRegistered);
     return validatorAffiliated
       .selectKey((key, event) -> ((StringParameter) event.getDetails().getIndexedParameters().get(1)).getValue())
       .groupByKey()
       .count()
+      .filter((k, v) -> validatorsGroupRegisteredList.contains(k))
       .groupBy(new KeyValueMapper<String, Long, KeyValue<Long, Long>>() {
         @Override
         public KeyValue<Long, Long> apply(String s, Long aLong) {
@@ -171,6 +171,34 @@ public class EventProcessor {
       }, Grouped.with(Serdes.Long(), Serdes.Long()))
       .count()
       ;
+  }
+
+  /**
+   * Release an alert when there are not new validators in the last 10 minutes.
+   *
+   * @param builder Stream builder
+   * @param validatorRegisteredTopic List with the topic name to subscribe to get the validatorRegistered
+   * @param eventBlockAvroSerde Serde for the eventBlock type.
+   * @param duration Duration od the window
+   */
+  public void alertNoNewValidatorsInTime(StreamsBuilder builder, List<String> validatorRegisteredTopic, Serde<EventBlock> eventBlockAvroSerde, Long duration) {
+    builder.stream(validatorRegisteredTopic, Consumed.with(Serdes.String(), eventBlockAvroSerde)
+      .withTimestampExtractor(new EventBlockTimestampExtractor()))
+      .groupByKey()
+      .windowedBy(TimeWindows.of(Duration.ofSeconds(duration)).grace(Duration.ofSeconds(duration)))
+      .count(Materialized.<String, Long, WindowStore<Bytes, byte[]>>as("count-metric"))
+      .suppress(untilWindowCloses(unbounded()))
+      .filter((k, v) -> v < 1)
+      .toStream()
+      .foreach((x, y) -> System.out.println("ERROR, no new validators"));
+  }
+
+  private List<String> listWithValidatorGroupsRegistered(KStream<String, EventBlock> validatorGroupRegistered) {
+    List<String> zeroValidators = new ArrayList<String>();
+    validatorGroupRegistered
+      .selectKey((key, event) -> ((StringParameter) event.getDetails().getIndexedParameters().get(0)).getValue())
+      .foreach((key, value) -> zeroValidators.add(key));
+    return zeroValidators;
   }
 
 
