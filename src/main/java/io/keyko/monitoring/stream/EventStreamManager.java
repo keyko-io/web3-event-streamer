@@ -18,7 +18,6 @@ import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.KTable;
 import org.apache.kafka.streams.kstream.Produced;
 
-import java.lang.reflect.Array;
 import java.util.*;
 
 public class EventStreamManager implements EventSerdes {

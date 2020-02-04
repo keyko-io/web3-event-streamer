@@ -152,7 +152,8 @@ public class EventProcessor {
   public void alertNoEpochRewardsDistributed(StreamsBuilder builder, List<String> EpochRewardsDistributedToVoters, Serde<EventBlock> eventBlockAvroSerde) {
     builder.stream(EpochRewardsDistributedToVoters, Consumed.with(Serdes.String(), eventBlockAvroSerde))
       .filter((key, event) -> ((NumberParameter) event.getDetails().getNonIndexedParameters().get(0)).getValue().equals("0"))
-      .foreach((x, y) -> System.out.println("NoEpochRewardsDistributed for group: " + ((StringParameter) y.getDetails().getIndexedParameters().get(0)).getValue()));
+      .to("w3m-alerts");
+//      .foreach((x, y) -> System.out.println("NoEpochRewardsDistributed for group: " + ((StringParameter) y.getDetails().getIndexedParameters().get(0)).getValue()));
   }
 
 }
