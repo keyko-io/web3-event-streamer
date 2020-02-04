@@ -2,8 +2,8 @@ package io.keyko.monitoring;
 
 import io.confluent.kafka.serializers.AbstractKafkaAvroSerDeConfig;
 import io.confluent.kafka.streams.serdes.avro.SpecificAvroSerde;
+import io.keyko.monitoring.schemas.*;
 import io.keyko.monitoring.stream.EventProcessor;
-import net.consensys.eventeum.*;
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -11,6 +11,7 @@ import org.apache.kafka.common.serialization.StringSerializer;
 import org.apache.kafka.streams.*;
 import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.KTable;
+import org.apache.kafka.streams.kstream.Produced;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -73,10 +74,10 @@ public class EventProcessorTest {
   public EventBlock epochrewardsdistributedtovotersEventWithBlock1 = new EventBlock("45", "", epochrewardsdistributedtovotersDetails1, blockEpochrewardsdistributedtovotersDetails1, 0);
 
 
-
   final Serde<ContractEvent> eventAvroSerde = new SpecificAvroSerde<>();
   final Serde<BlockEvent> blockAvroSerde = new SpecificAvroSerde<BlockEvent>();
   final Serde<EventBlock> eventBlockAvroSerde = new SpecificAvroSerde<>();
+  final Serde<AlertEvent> alertAvroSerde = new SpecificAvroSerde<>();
   private StreamsBuilder builder;
 
 
@@ -94,6 +95,7 @@ public class EventProcessorTest {
     eventAvroSerde.configure(conf, false);
     blockAvroSerde.configure(conf, false);
     eventBlockAvroSerde.configure(conf, false);
+    alertAvroSerde.configure(conf, false);
     builder = new StreamsBuilder();
   }
 
@@ -144,12 +146,15 @@ public class EventProcessorTest {
 
   @Test
   public void shouldReleaseAlertWhenRewardsAreZero() {
-    new EventProcessor().alertNoEpochRewardsDistributed(builder, Collections.singletonList("epochrewardsdistributedtovoters"), eventBlockAvroSerde);
+    new EventProcessor().alertNoEpochRewardsDistributed(builder, Collections.singletonList("epochrewardsdistributedtovoters"), eventBlockAvroSerde).to("w3m-alerts", Produced.with(Serdes.String(), alertAvroSerde));
     Topology topology = builder.build();
     TopologyTestDriver driver = new TopologyTestDriver(topology, config);
     TestInputTopic<String, EventBlock> inputTopicValidatorRegistered = driver.createInputTopic("epochrewardsdistributedtovoters", new StringSerializer(), eventBlockAvroSerde.serializer());
     inputTopicValidatorRegistered.pipeInput(epochrewardsdistributedtovotersEventWithBlock.getId(), epochrewardsdistributedtovotersEventWithBlock);
     inputTopicValidatorRegistered.pipeInput(epochrewardsdistributedtovotersEventWithBlock1.getId(), epochrewardsdistributedtovotersEventWithBlock1);
+
+    TestOutputTopic<String, AlertEvent> transferTopic = driver.createOutputTopic("w3m-alerts", new StringDeserializer(), alertAvroSerde.deserializer());
+    assertEquals(transferTopic.readKeyValue().key,epochrewardsdistributedtovotersEventWithBlock.getId());
 
     driver.close();
 

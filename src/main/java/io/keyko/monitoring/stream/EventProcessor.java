@@ -1,13 +1,9 @@
 package io.keyko.monitoring.stream;
 
 import io.keyko.monitoring.model.AccountCreatedAggregation;
+import io.keyko.monitoring.schemas.*;
 import io.keyko.monitoring.time.EventBlockTimestampExtractor;
 import io.keyko.monitoring.windows.DailyTimeWindows;
-import net.consensys.eventeum.BlockEvent;
-import net.consensys.eventeum.ContractEvent;
-import net.consensys.eventeum.EventBlock;
-import net.consensys.eventeum.NumberParameter;
-import net.consensys.eventeum.StringParameter;
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.common.utils.Bytes;
@@ -149,10 +145,20 @@ public class EventProcessor {
 
   }
 
-  public void alertNoEpochRewardsDistributed(StreamsBuilder builder, List<String> EpochRewardsDistributedToVoters, Serde<EventBlock> eventBlockAvroSerde) {
-    builder.stream(EpochRewardsDistributedToVoters, Consumed.with(Serdes.String(), eventBlockAvroSerde))
+  public KStream<String, AlertEvent> alertNoEpochRewardsDistributed(StreamsBuilder builder, List<String> EpochRewardsDistributedToVoters, Serde<EventBlock> eventBlockAvroSerde) {
+    return builder.stream(EpochRewardsDistributedToVoters, Consumed.with(Serdes.String(), eventBlockAvroSerde))
       .filter((key, event) -> ((NumberParameter) event.getDetails().getNonIndexedParameters().get(0)).getValue().equals("0"))
-      .to("w3m-alerts");
+      .map((key, event) ->
+        KeyValue.pair(key,
+          AlertEvent.newBuilder()
+            .setName("alertNoEpochRewardsDistributed")
+            .setReference(event.getId())
+            .setStatus(AlertEventStatus.ERROR)
+            .setTimestamp(event.getDetailsBlock().getTimestamp())
+            .setDescription("NoEpochRewardsDistributed for group: " + ((StringParameter) event.getDetails().getIndexedParameters().get(0)).getValue())
+            .build())
+      );
+//      .to("w3m-alerts");
 //      .foreach((x, y) -> System.out.println("NoEpochRewardsDistributed for group: " + ((StringParameter) y.getDetails().getIndexedParameters().get(0)).getValue()));
   }
 
