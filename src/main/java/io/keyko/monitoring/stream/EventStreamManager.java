@@ -18,6 +18,7 @@ import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.KTable;
 import org.apache.kafka.streams.kstream.Produced;
 
+import java.lang.reflect.Array;
 import java.util.*;
 
 public class EventStreamManager implements EventSerdes {
@@ -98,6 +99,8 @@ public class EventStreamManager implements EventSerdes {
     List<String> accountsTopics = Arrays.asList("AccountCreated".toLowerCase(), "ValidatorSignerAuthorized".toLowerCase());//, "VoteSignerAuthorized".toLowerCase(), "AttestationSignerAuthorized".toLowerCase());
     KStream<String, AccountCreatedAggregation> accountsCreatedDayStream = eventProcessor.accountDailyAggregation(accountsTopics, builder, eventBlockAvroSerde);
     accountsCreatedDayStream.to(configuration.getAccountsAggregationTopic(), Produced.with(Serdes.String(), new JsonPOJOSerde<AccountCreatedAggregation>(AccountCreatedAggregation.class)));
+
+    eventProcessor.alertNoEpochRewardsDistributed(builder, Collections.singletonList("EpochRewardsDistributedToVoters".toLowerCase()),eventBlockAvroSerde);
 
     return new KafkaStreams(builder.build(), this.getStreamConfiguration());
 
