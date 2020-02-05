@@ -15,6 +15,7 @@ import org.apache.kafka.streams.state.WindowStore;
 import java.time.Duration;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static org.apache.kafka.streams.kstream.Suppressed.BufferConfig.unbounded;
@@ -97,15 +98,15 @@ public class EventProcessor {
       accountsCreatedStream
         .selectKey((key, event) -> event.getDetails().getName())
         .groupByKey(Grouped.with(Serdes.String(), eventBlockAvroSerde))
-        .windowedBy(new DailyTimeWindows(zone, windowStartHour, gracePeriod))
-        // .windowedBy(TimeWindows.of(Duration.ofSeconds(10)))
-        .count(Materialized.<String, Long, WindowStore<Bytes, byte[]>>with(Serdes.String(), Serdes.Long())
+        //.windowedBy(new DailyTimeWindows(zone, windowStartHour, gracePeriod))
+        .windowedBy(TimeWindows.of(Duration.ofSeconds(60)))
+        .count()//Materialized.<String, Long, WindowStore<Bytes, byte[]>>with(Serdes.String(), Serdes.Long())
           // the default store retention time is 1 day;
           // need to explicitly increase the retention time
           // to allow for a 1-day window plus configured grace period
-          .withRetention(Duration.ofDays(1L).plus(gracePeriod)))
+          //.withRetention(Duration.ofDays(1L).plus(gracePeriod)))
         // emits the final count when the window is closed.
-        .suppress(Suppressed.untilWindowCloses(unbounded()));
+        //.suppress(Suppressed.untilWindowCloses(unbounded()));
     ;
 
     return formatAccountCreatedAggregation(accountsCreatedDayTable, zone);
@@ -133,12 +134,12 @@ public class EventProcessor {
 
         );
 
-        //DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy - HH:mm:ss Z");
-        //String formattedString = windowed.window().startTime().atZone(ZoneOffset.UTC).format(formatter);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy - HH:mm:ss Z");
+        String formattedString = windowed.window().startTime().atZone(ZoneOffset.UTC).format(formatter);
 
-        //String key = windowed.key().concat("-").concat(formattedString);
+        String key = windowed.key().concat("-").concat(formattedString);
 
-        String key = windowed.key().concat("-").concat(accountCreatedAggregation.getDate());
+        //String key = windowed.key().concat("-").concat(accountCreatedAggregation.getDate());
         return KeyValue.pair(key, accountCreatedAggregation);
 
       });
