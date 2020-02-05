@@ -19,7 +19,7 @@ public class BaseAggregation {
   }
 
 
-  private String formatDateTime(ZonedDateTime datetime) {
+  protected String formatDateTime(ZonedDateTime datetime) {
     return datetime.format(formatter);
   }
 
