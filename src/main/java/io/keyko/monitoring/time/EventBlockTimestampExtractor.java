@@ -1,6 +1,6 @@
 package io.keyko.monitoring.time;
 
-import net.consensys.eventeum.EventBlock;
+import io.keyko.monitoring.schemas.EventBlock;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.streams.processor.TimestampExtractor;
 

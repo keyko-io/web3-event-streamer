@@ -3,11 +3,12 @@ package io.keyko.monitoring.stream;
 import io.confluent.kafka.serializers.AbstractKafkaAvroSerDeConfig;
 import io.keyko.monitoring.config.StreamerConfig;
 import io.keyko.monitoring.model.AccountCreatedAggregation;
+import io.keyko.monitoring.schemas.AlertEvent;
+import io.keyko.monitoring.schemas.BlockEvent;
+import io.keyko.monitoring.schemas.ContractEvent;
+import io.keyko.monitoring.schemas.EventBlock;
 import io.keyko.monitoring.serde.EventSerdes;
 import io.keyko.monitoring.serde.JsonPOJOSerde;
-import net.consensys.eventeum.BlockEvent;
-import net.consensys.eventeum.ContractEvent;
-import net.consensys.eventeum.EventBlock;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.KafkaStreams;
@@ -17,6 +18,8 @@ import org.apache.kafka.streams.kstream.Consumed;
 import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.KTable;
 import org.apache.kafka.streams.kstream.Produced;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.*;
 
@@ -25,6 +28,7 @@ public class EventStreamManager implements EventSerdes {
   private StreamerConfig configuration;
   private static final Integer DEFAULT_THREADS = 1;
   private static final Integer DEFAULT_REPLICATION_FACTOR = 1;
+  private static final Logger LOGGER = LogManager.getLogger(EventStreamManager.class);
 
 
   public EventStreamManager(StreamerConfig streamerConfig) {
@@ -82,6 +86,7 @@ public class EventStreamManager implements EventSerdes {
     eventAvroSerde.configure(serdeConfig, false);
     blockAvroSerde.configure(serdeConfig, false);
     eventBlockAvroSerde.configure(serdeConfig, false);
+    alertAvroSerde.configure(serdeConfig, false);
 
 
     KStream<String, ContractEvent> contractEvents = builder.stream(configuration.getContractEventTopic(), Consumed.with(Serdes.String(), eventAvroSerde));
@@ -98,6 +103,9 @@ public class EventStreamManager implements EventSerdes {
     List<String> accountsTopics = Arrays.asList("AccountCreated".toLowerCase(), "ValidatorSignerAuthorized".toLowerCase());//, "VoteSignerAuthorized".toLowerCase(), "AttestationSignerAuthorized".toLowerCase());
     KStream<String, AccountCreatedAggregation> accountsCreatedDayStream = eventProcessor.accountDailyAggregation(accountsTopics, builder, eventBlockAvroSerde);
     accountsCreatedDayStream.to(configuration.getAccountsAggregationTopic(), Produced.with(Serdes.String(), new JsonPOJOSerde<AccountCreatedAggregation>(AccountCreatedAggregation.class)));
+
+    KStream<String, AlertEvent> alertEventKStream = eventProcessor.alertNoEpochRewardsDistributed(builder, Collections.singletonList("EpochRewardsDistributedToVoters".toLowerCase()), eventBlockAvroSerde);
+    alertEventKStream.to(configuration.getAlertsTopic(), Produced.with(Serdes.String(),alertAvroSerde));
 
     return new KafkaStreams(builder.build(), this.getStreamConfiguration());
 

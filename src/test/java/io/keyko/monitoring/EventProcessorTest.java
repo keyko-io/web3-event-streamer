@@ -2,8 +2,8 @@ package io.keyko.monitoring;
 
 import io.confluent.kafka.serializers.AbstractKafkaAvroSerDeConfig;
 import io.confluent.kafka.streams.serdes.avro.SpecificAvroSerde;
+import io.keyko.monitoring.schemas.*;
 import io.keyko.monitoring.stream.EventProcessor;
-import net.consensys.eventeum.*;
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -11,6 +11,7 @@ import org.apache.kafka.common.serialization.StringSerializer;
 import org.apache.kafka.streams.*;
 import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.KTable;
+import org.apache.kafka.streams.kstream.Produced;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -54,9 +55,29 @@ public class EventProcessorTest {
   public EventBlock oracleReportedEventWithBlock = new EventBlock("0x27bc3eda4e3eaae838dd44f4a9fd4564f4455c51e336daa4232afd4ea190f0f1-0x73090d8e7bb7b2a2b550474c2c90e8059d9bfdcd752c5fc55af18f54debfb88d-0", "", oracleReportedDetails, blockOracleReportedDetails, 0);
 
 
+  public ContractEventDetails epochrewardsdistributedtovotersDetails = new ContractEventDetails("EpochRewardsDistributedToVoters", "EpochRewardsDistributedToVoters", "default",
+    Collections.singletonList(new StringParameter("group", "address", "VG3")),
+    Collections.singletonList(new NumberParameter("value", "uint256", "0")), "0x294d73910e7c1e7cd8f0bf341e513c0269a089b36c22c2ac006269eb59e6e6be",
+    "0", "43", "0x8ce40858181dccf410331c4b3edf0187ac7b887aeb5c6e0bce2dbc09635f470e", "0xC03c31f91b893317C786AB6b6A2a6BdD61db9c55", ContractEventStatus.CONFIRMED,
+    "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef", "default",
+    "43");
+  public BlockDetails blockEpochrewardsdistributedtovotersDetails = new BlockDetails("43", "0x8ce40858181dccf410331c4b3edf0187ac7b887aeb5c6e0bce2dbc09635f470e", "1234", "default");
+  public EventBlock epochrewardsdistributedtovotersEventWithBlock = new EventBlock("43", "", epochrewardsdistributedtovotersDetails, blockEpochrewardsdistributedtovotersDetails, 0);
+
+  public ContractEventDetails epochrewardsdistributedtovotersDetails1 = new ContractEventDetails("EpochRewardsDistributedToVoters", "EpochRewardsDistributedToVoters", "default",
+    Collections.singletonList(new StringParameter("group", "address", "VG3")),
+    Collections.singletonList(new NumberParameter("value", "uint256", "3")), "0x294d73910e7c1e7cd8f0bf341e513c0269a089b36c22c2ac006269eb59e6e6be",
+    "0", "45", "0x8ce40858181dccf410331c4b3edf0187ac7b887aeb5c6e0bce2dbc09635f470e", "0xC03c31f91b893317C786AB6b6A2a6BdD61db9c55", ContractEventStatus.CONFIRMED,
+    "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef", "default",
+    "45");
+  public BlockDetails blockEpochrewardsdistributedtovotersDetails1 = new BlockDetails("45", "0x8ce40858181dccf410331c4b3edf0187ac7b887aeb5c6e0bce2dbc09635f470e", "1234", "default");
+  public EventBlock epochrewardsdistributedtovotersEventWithBlock1 = new EventBlock("45", "", epochrewardsdistributedtovotersDetails1, blockEpochrewardsdistributedtovotersDetails1, 0);
+
+
   final Serde<ContractEvent> eventAvroSerde = new SpecificAvroSerde<>();
   final Serde<BlockEvent> blockAvroSerde = new SpecificAvroSerde<BlockEvent>();
   final Serde<EventBlock> eventBlockAvroSerde = new SpecificAvroSerde<>();
+  final Serde<AlertEvent> alertAvroSerde = new SpecificAvroSerde<>();
   private StreamsBuilder builder;
 
 
@@ -74,6 +95,7 @@ public class EventProcessorTest {
     eventAvroSerde.configure(conf, false);
     blockAvroSerde.configure(conf, false);
     eventBlockAvroSerde.configure(conf, false);
+    alertAvroSerde.configure(conf, false);
     builder = new StreamsBuilder();
   }
 
@@ -121,4 +143,21 @@ public class EventProcessorTest {
     assertEquals(oracleReportedTopic.readValue().getId(), oracleReportedEventWithBlock.getId());
     driver.close();
   }
+
+  @Test
+  public void shouldReleaseAlertWhenRewardsAreZero() {
+    new EventProcessor().alertNoEpochRewardsDistributed(builder, Collections.singletonList("epochrewardsdistributedtovoters"), eventBlockAvroSerde).to("w3m-alerts", Produced.with(Serdes.String(), alertAvroSerde));
+    Topology topology = builder.build();
+    TopologyTestDriver driver = new TopologyTestDriver(topology, config);
+    TestInputTopic<String, EventBlock> inputTopicValidatorRegistered = driver.createInputTopic("epochrewardsdistributedtovoters", new StringSerializer(), eventBlockAvroSerde.serializer());
+    inputTopicValidatorRegistered.pipeInput(epochrewardsdistributedtovotersEventWithBlock.getId(), epochrewardsdistributedtovotersEventWithBlock);
+    inputTopicValidatorRegistered.pipeInput(epochrewardsdistributedtovotersEventWithBlock1.getId(), epochrewardsdistributedtovotersEventWithBlock1);
+
+    TestOutputTopic<String, AlertEvent> transferTopic = driver.createOutputTopic("w3m-alerts", new StringDeserializer(), alertAvroSerde.deserializer());
+    assertEquals(transferTopic.readKeyValue().key,epochrewardsdistributedtovotersEventWithBlock.getId());
+
+    driver.close();
+
+  }
+
 }
