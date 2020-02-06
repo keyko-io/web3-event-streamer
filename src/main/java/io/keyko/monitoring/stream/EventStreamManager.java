@@ -18,6 +18,8 @@ import org.apache.kafka.streams.kstream.Consumed;
 import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.KTable;
 import org.apache.kafka.streams.kstream.Produced;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.*;
 
@@ -26,6 +28,7 @@ public class EventStreamManager implements EventSerdes {
   private StreamerConfig configuration;
   private static final Integer DEFAULT_THREADS = 1;
   private static final Integer DEFAULT_REPLICATION_FACTOR = 1;
+  private static final Logger LOGGER = LogManager.getLogger(EventStreamManager.class);
 
 
   public EventStreamManager(StreamerConfig streamerConfig) {
