@@ -170,20 +170,33 @@
           <release>11</release>
         </configuration>
       </plugin>
-      <!-- Javadoc plugin -->
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-javadoc-plugin</artifactId>
-        <version>3.1.1</version>
-        <executions>
-          <execution>
-            <id>attach-javadocs</id>
-            <goals>
-              <goal>jar</goal>
-            </goals>
-          </execution>
-        </executions>
+        <!--
+           See https://wiki.jasig.org/display/LIC/maven-notice-plugin
+           In a nutshell: `mvn notice:check` and `mvn notice:generate`
+        -->
+        <groupId>org.jasig.maven</groupId>
+        <artifactId>maven-notice-plugin</artifactId>
+        <version>1.0.6.1</version>
+        <configuration>
+          <licenseMapping>
+            <param>../license-mappings.xml</param>
+          </licenseMapping>
+        </configuration>
       </plugin>
+      <!-- Nexus Staging Plugin -->
+      <plugin>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>nexus-staging-maven-plugin</artifactId>
+        <version>1.6.8</version>
+        <extensions>true</extensions>
+        <configuration>
+          <serverId>ossrh</serverId>
+          <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+          <autoReleaseAfterClose>false</autoReleaseAfterClose>
+        </configuration>
+      </plugin>
+
     </plugins>
 
   </build>
