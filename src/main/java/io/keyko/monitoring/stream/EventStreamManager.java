@@ -2,9 +2,7 @@ package io.keyko.monitoring.stream;
 
 import io.confluent.kafka.serializers.AbstractKafkaAvroSerDeConfig;
 import io.keyko.monitoring.config.StreamerConfig;
-import io.keyko.monitoring.model.AccountCreatedAggregation;
 import io.keyko.monitoring.serde.EventSerdes;
-import io.keyko.monitoring.serde.JsonPOJOSerde;
 import net.consensys.eventeum.BlockEvent;
 import net.consensys.eventeum.ContractEvent;
 import net.consensys.eventeum.EventBlock;
@@ -16,9 +14,10 @@ import org.apache.kafka.streams.StreamsConfig;
 import org.apache.kafka.streams.kstream.Consumed;
 import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.KTable;
-import org.apache.kafka.streams.kstream.Produced;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Properties;
 
 public class EventStreamManager implements EventSerdes {
 
@@ -93,11 +92,6 @@ public class EventStreamManager implements EventSerdes {
     KStream<String, EventBlock> eventBlockStream = eventProcessor.joinEventWithBlock(eventAvroStream, blockAvroStream, eventAvroSerde, blockAvroSerde);
 
     eventProcessor.splitTopics(eventBlockStream, eventBlockAvroSerde);
-
-
-    List<String> accountsTopics = Arrays.asList("AccountCreated".toLowerCase(), "ValidatorSignerAuthorized".toLowerCase());//, "VoteSignerAuthorized".toLowerCase(), "AttestationSignerAuthorized".toLowerCase());
-    KStream<String, AccountCreatedAggregation> accountsCreatedDayStream = eventProcessor.accountDailyAggregation(accountsTopics, builder, eventBlockAvroSerde);
-    accountsCreatedDayStream.to(configuration.getAccountsAggregationTopic(), Produced.with(Serdes.String(), new JsonPOJOSerde<AccountCreatedAggregation>(AccountCreatedAggregation.class)));
 
     return new KafkaStreams(builder.build(), this.getStreamConfiguration());
 
