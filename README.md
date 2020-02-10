@@ -1,5 +1,7 @@
 # keyko-event-streamer
 
+![Web3 event streamer CI](https://github.com/keyko-io/web3-event-streamer/workflows/Java%20CI/badge.svg?branch=master)
+
 Simple kafka stream process that enrich kafka topic generated with eventeum.
 
 How to start
