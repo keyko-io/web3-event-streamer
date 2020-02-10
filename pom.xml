@@ -12,6 +12,10 @@
     <typesafe.config.version>1.4.0</typesafe.config.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
+    <description>
+      Simple kafka stream process that enrich kafka topic generated with eventeum.
+    </description>
+
   </properties>
 
   <licenses>
