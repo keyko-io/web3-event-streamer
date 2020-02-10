@@ -7,15 +7,14 @@
   <name>Web3 Monitoring Schemas</name>
   <url>https://github.com/keyko-io/web3-event-streamer</url>
   <inceptionYear>2019</inceptionYear>
+  <description>
+    Simple kafka stream process that enrich kafka topic generated with eventeum.
+  </description>
+
   <properties>
     <kafka.version>2.4.0</kafka.version>
     <typesafe.config.version>1.4.0</typesafe.config.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
-    <description>
-      Simple kafka stream process that enrich kafka topic generated with eventeum.
-    </description>
-
   </properties>
 
   <licenses>
