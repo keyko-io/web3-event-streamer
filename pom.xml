@@ -4,7 +4,7 @@
   <groupId>io.keyko.monitoring</groupId>
   <artifactId>web3-event-streamer</artifactId>
   <version>0.0.1</version>
-  <name>Web3 Monitoring Schemas</name>
+  <name>Web3 Monitoring Event Streamer</name>
   <url>https://github.com/keyko-io/web3-event-streamer</url>
   <inceptionYear>2019</inceptionYear>
   <description>
