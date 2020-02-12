@@ -104,7 +104,7 @@ public class EventProcessorTest {
   public void splitConfirmedTopics() {
     KStream<String, EventBlock> transferEvents = builder.stream("confirmedEvents");
 
-    new EventProcessor().splitTopics(transferEvents, eventBlockAvroSerde);
+    new EventProcessor().splitEventTopics(transferEvents, eventBlockAvroSerde);
     Topology topology = builder.build();
     TopologyTestDriver driver = new TopologyTestDriver(topology, config);
 
