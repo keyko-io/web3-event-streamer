@@ -1,9 +1,9 @@
 package io.keyko.monitoring.serde;
 
 import io.confluent.kafka.streams.serdes.avro.SpecificAvroSerde;
-import net.consensys.eventeum.BlockEvent;
-import net.consensys.eventeum.ContractEvent;
-import net.consensys.eventeum.EventBlock;
+import io.keyko.monitoring.schemas.BlockEvent;
+import io.keyko.monitoring.schemas.ContractEvent;
+import io.keyko.monitoring.schemas.EventBlock;
 
 
 public interface EventSerdes {

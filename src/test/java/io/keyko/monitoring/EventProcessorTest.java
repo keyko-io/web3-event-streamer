@@ -3,7 +3,7 @@ package io.keyko.monitoring;
 import io.confluent.kafka.serializers.AbstractKafkaAvroSerDeConfig;
 import io.confluent.kafka.streams.serdes.avro.SpecificAvroSerde;
 import io.keyko.monitoring.stream.EventProcessor;
-import net.consensys.eventeum.*;
+import io.keyko.monitoring.schemas.*;
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.common.serialization.StringDeserializer;

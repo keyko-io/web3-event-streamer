@@ -1,8 +1,8 @@
 package io.keyko.monitoring.stream;
 
-import net.consensys.eventeum.BlockEvent;
-import net.consensys.eventeum.ContractEvent;
-import net.consensys.eventeum.EventBlock;
+import io.keyko.monitoring.schemas.BlockEvent;
+import io.keyko.monitoring.schemas.ContractEvent;
+import io.keyko.monitoring.schemas.EventBlock;
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.kstream.Joined;
