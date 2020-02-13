@@ -53,10 +53,19 @@ public class EventProcessorTest {
 
   public EventBlock oracleReportedEventWithBlock = new EventBlock("0x27bc3eda4e3eaae838dd44f4a9fd4564f4455c51e336daa4232afd4ea190f0f1-0x73090d8e7bb7b2a2b550474c2c90e8059d9bfdcd752c5fc55af18f54debfb88d-0", "", oracleReportedDetails, blockOracleReportedDetails, 0);
 
+  public ContractViewDetails contractViewDetailsBalance = new ContractViewDetails("CeloGold-balanceOf",
+    "1","default",
+    Collections.singletonList(new NumberParameter("balance", "uint256", "12")),
+    "15129","0x8ce40858181dccf410331c4b3edf0187ac7b887aeb5c6e0bce2dbc09635f470a","default","default","CeloGold-balanceOf-7c");
+
+  public ContractView viewBalance = new ContractView("CeloGold-balanceOf-7c", "CONTRACT_VIEW", contractViewDetailsBalance, 0);
+
 
   final Serde<ContractEvent> eventAvroSerde = new SpecificAvroSerde<>();
+  final Serde<ContractView> viewAvroSerde = new SpecificAvroSerde<>();
   final Serde<BlockEvent> blockAvroSerde = new SpecificAvroSerde<BlockEvent>();
   final Serde<EventBlock> eventBlockAvroSerde = new SpecificAvroSerde<>();
+  final Serde<ViewBlock> viewBlockAvroSerde = new SpecificAvroSerde<>();
   private StreamsBuilder builder;
 
 
@@ -72,8 +81,10 @@ public class EventProcessorTest {
     conf.put(AbstractKafkaAvroSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, MOCK_SCHEMA_REGISTRY_URL);
 
     eventAvroSerde.configure(conf, false);
+    viewAvroSerde.configure(conf, false);
     blockAvroSerde.configure(conf, false);
     eventBlockAvroSerde.configure(conf, false);
+    viewBlockAvroSerde.configure(conf, false);
     builder = new StreamsBuilder();
   }
 
@@ -121,4 +132,29 @@ public class EventProcessorTest {
     assertEquals(oracleReportedTopic.readValue().getId(), oracleReportedEventWithBlock.getId());
     driver.close();
   }
+
+
+  @Test
+  public void shouldJoinViewWithBlock() {
+
+    KStream<String, ContractView> contractViewKStream = builder.stream("w3m-contract-views");
+    KTable<String, BlockEvent> blockEvents = builder.table("w3m-block-events");
+    new EventProcessor().joinViewWithBlock(contractViewKStream, blockEvents, viewAvroSerde, blockAvroSerde).to("join");
+    Topology topology = builder.build();
+
+    TopologyTestDriver driver = new TopologyTestDriver(topology, config);
+
+    TestInputTopic<String, BlockEvent> inputBlockTopic = driver.createInputTopic("w3m-block-events", new StringSerializer(), blockAvroSerde.serializer());
+    TestInputTopic<String, ContractView> inputViewTopic = driver.createInputTopic("w3m-contract-views", new StringSerializer(), viewAvroSerde.serializer());
+    inputBlockTopic.pipeInput(transferBlock.getId(), transferBlock);
+    inputViewTopic.pipeInput(viewBalance.getId(), viewBalance);
+
+    TestOutputTopic<String, ViewBlock> joinTopic = driver.createOutputTopic("join", new StringDeserializer(), viewBlockAvroSerde.deserializer());
+    ViewBlock result = joinTopic.readValue();
+
+    assertEquals(result.getDetailsBlock(), transferBlock.getDetails());
+    assertEquals(result.getDetails(), viewBalance.getDetails());
+    driver.close();
+  }
+
 }
