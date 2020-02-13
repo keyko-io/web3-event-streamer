@@ -3,12 +3,12 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.keyko.monitoring</groupId>
   <artifactId>web3-event-streamer</artifactId>
-  <version>0.0.1</version>
+  <version>0.1.0</version>
   <name>Web3 Monitoring Event Streamer</name>
   <url>https://github.com/keyko-io/web3-event-streamer</url>
   <inceptionYear>2019</inceptionYear>
   <description>
-    Simple kafka stream process that enrich kafka topic generated with eventeum.
+    Kafka stream processors that enrich data generated with web3-monitoring agent
   </description>
 
   <properties>
@@ -20,7 +20,7 @@
     <org.json.version>20190722</org.json.version>
     <typesafe.config.version>1.4.0</typesafe.config.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <keyko.schemas.version>0.1.1</keyko.schemas.version>
+    <keyko.schemas.version>0.1.2</keyko.schemas.version>
     <junit.version>4.4</junit.version>
   </properties>
 
@@ -197,6 +197,7 @@
         <configuration>
           <serverId>ossrh</serverId>
           <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+          <skipStaging>true</skipStaging>
           <autoReleaseAfterClose>false</autoReleaseAfterClose>
         </configuration>
       </plugin>
