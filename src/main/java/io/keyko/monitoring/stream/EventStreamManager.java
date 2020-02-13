@@ -1,17 +1,19 @@
 package io.keyko.monitoring.stream;
 
-import io.confluent.kafka.serializers.AbstractKafkaAvroSerDeConfig;
 import io.keyko.monitoring.config.StreamerConfig;
+import io.keyko.monitoring.postprocessing.Output;
+import io.keyko.monitoring.preprocessing.Filters;
+import io.keyko.monitoring.preprocessing.Input;
+import io.keyko.monitoring.preprocessing.Transformations;
 import io.keyko.monitoring.serde.EventSerdes;
 import io.keyko.monitoring.schemas.BlockEvent;
 import io.keyko.monitoring.schemas.ContractEvent;
 import io.keyko.monitoring.schemas.EventBlock;
+import io.keyko.monitoring.serde.Web3MonitoringSerdes;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
-import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.StreamsConfig;
-import org.apache.kafka.streams.kstream.Consumed;
 import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.KTable;
 
@@ -70,28 +72,19 @@ public class EventStreamManager implements EventSerdes {
   private KafkaStreams createStreams() {
 
     final StreamsBuilder builder = new StreamsBuilder();
-    EventProcessor eventProcessor = new EventProcessor();
+
+    Web3MonitoringSerdes.configureSerdes(configuration.getSchemaRegistryUrl());
 
 
-    final Map<String, String> serdeConfig =
-      Collections.singletonMap(AbstractKafkaAvroSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG,
-        configuration.getSchemaRegistryUrl());
 
+    final KTable<String, BlockEvent> blockAvroStream = Input.getBlockTable(configuration, builder);
 
-    eventAvroSerde.configure(serdeConfig, false);
-    blockAvroSerde.configure(serdeConfig, false);
-    eventBlockAvroSerde.configure(serdeConfig, false);
+    KStream<String, ContractEvent> contractEvents = Input.getEventStream(configuration, builder);
+    final KStream<String, ContractEvent> eventAvroStream = Filters.filterConfirmed(contractEvents);
 
+    KStream<String, EventBlock> eventBlockStream = Transformations.joinEventWithBlock(eventAvroStream, blockAvroStream);
 
-    KStream<String, ContractEvent> contractEvents = builder.stream(configuration.getContractEventTopic(), Consumed.with(Serdes.String(), eventAvroSerde));
-
-    final KStream<String, ContractEvent> eventAvroStream = eventProcessor.filterConfirmed(contractEvents);
-
-    final KTable<String, BlockEvent> blockAvroStream = builder.table(configuration.getBlockEventTopic(), Consumed.with(Serdes.String(), blockAvroSerde));
-
-    KStream<String, EventBlock> eventBlockStream = eventProcessor.joinEventWithBlock(eventAvroStream, blockAvroStream, eventAvroSerde, blockAvroSerde);
-
-    eventProcessor.splitTopics(eventBlockStream, eventBlockAvroSerde);
+    Output.splitByEvent(eventBlockStream);
 
     return new KafkaStreams(builder.build(), this.getStreamConfiguration());
 
