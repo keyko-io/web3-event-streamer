@@ -12,9 +12,6 @@ public class StreamerConfig {
   private static final String FLAT_EVENT_TOPIC = "kafka.flat-event-topic";
   private static final String ALERTS_TOPIC = "kafka.alerts-topic";
 
-  private StreamerConfig() {
-  }
-
   private String kafkaServer;
   private String schemaRegistryUrl;
   private String contractEventTopic;
@@ -23,29 +20,17 @@ public class StreamerConfig {
   private String flatEventTopic;
   private String alertsTopic;
 
+  public StreamerConfig(Config config) {
 
-  private static StreamerConfig streamerConfig;
-
-
-  public static StreamerConfig getInstance(Config config) {
-
-    if (streamerConfig != null)
-      return streamerConfig;
-
-    streamerConfig = new StreamerConfig();
-    streamerConfig.setKafkaServer(config.getString(KAFKA_BOOTSTRAP_SERVER));
-    streamerConfig.setSchemaRegistryUrl(config.getString(SCHEMA_REGISTRY_URL));
-    streamerConfig.setContractEventTopic(config.getString(CONTRACT_EVENT_TOPIC));
-    streamerConfig.setBlockEventTopic(config.getString(BLOCK_TOPIC));
-    streamerConfig.setEventBlockTopic(config.getString(EVENT_BLOCK_TOPIC));
-    streamerConfig.setFlatEventTopic(config.getString(FLAT_EVENT_TOPIC));
-    streamerConfig.setAlertsTopic(config.getString(ALERTS_TOPIC));
-
-
-    return streamerConfig;
+    this.setKafkaServer(config.getString(KAFKA_BOOTSTRAP_SERVER));
+    this.setSchemaRegistryUrl(config.getString(SCHEMA_REGISTRY_URL));
+    this.setContractEventTopic(config.getString(CONTRACT_EVENT_TOPIC));
+    this.setBlockEventTopic(config.getString(BLOCK_TOPIC));
+    this.setEventBlockTopic(config.getString(EVENT_BLOCK_TOPIC));
+    this.setFlatEventTopic(config.getString(FLAT_EVENT_TOPIC));
+    this.setAlertsTopic(config.getString(ALERTS_TOPIC));
 
   }
-
 
   public String getKafkaServer() {
     return kafkaServer;

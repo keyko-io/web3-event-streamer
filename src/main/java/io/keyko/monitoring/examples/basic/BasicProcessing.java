@@ -32,7 +32,7 @@ public class BasicProcessing extends BaseStreamManager {
 
     Config config = args.length > 0 ? ConfigFactory.load(args[0]) : ConfigFactory.load();
 
-    StreamerConfig streamerConfig = StreamerConfig.getInstance(config);
+    StreamerConfig streamerConfig = new StreamerConfig(config);
     new BasicProcessing(streamerConfig).initStream();
 
   }
