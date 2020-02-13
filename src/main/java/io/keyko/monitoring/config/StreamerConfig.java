@@ -10,6 +10,7 @@ public class StreamerConfig {
   private static final String BLOCK_TOPIC = "kafka.block-topic";
   private static final String EVENT_BLOCK_TOPIC = "kafka.event-block-topic";
   private static final String FLAT_EVENT_TOPIC = "kafka.flat-event-topic";
+  private static final String ALERTS_TOPIC = "kafka.alerts-topic";
 
   private StreamerConfig() {
   }
@@ -20,6 +21,7 @@ public class StreamerConfig {
   private String blockEventTopic;
   private String eventBlockTopic;
   private String flatEventTopic;
+  private String alertsTopic;
 
 
   private static StreamerConfig streamerConfig;
@@ -37,6 +39,7 @@ public class StreamerConfig {
     streamerConfig.setBlockEventTopic(config.getString(BLOCK_TOPIC));
     streamerConfig.setEventBlockTopic(config.getString(EVENT_BLOCK_TOPIC));
     streamerConfig.setFlatEventTopic(config.getString(FLAT_EVENT_TOPIC));
+    streamerConfig.setAlertsTopic(config.getString(ALERTS_TOPIC));
 
 
     return streamerConfig;
@@ -90,6 +93,14 @@ public class StreamerConfig {
 
   public void setFlatEventTopic(String flatEventTopic) {
     this.flatEventTopic = flatEventTopic;
+  }
+
+  public String getAlertsTopic() {
+    return alertsTopic;
+  }
+
+  public void setAlertsTopic(String alertsTopic) {
+    this.alertsTopic = alertsTopic;
   }
 
 }
