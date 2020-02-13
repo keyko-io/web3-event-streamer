@@ -1,14 +1,9 @@
 package io.keyko.monitoring.stream;
 
 import io.keyko.monitoring.config.StreamerConfig;
-import io.keyko.monitoring.postprocessing.Output;
-import io.keyko.monitoring.preprocessing.Filters;
 import io.keyko.monitoring.preprocessing.Input;
-import io.keyko.monitoring.preprocessing.Transformations;
-import io.keyko.monitoring.serde.EventSerdes;
 import io.keyko.monitoring.schemas.BlockEvent;
 import io.keyko.monitoring.schemas.ContractEvent;
-import io.keyko.monitoring.schemas.EventBlock;
 import io.keyko.monitoring.serde.Web3MonitoringSerdes;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.streams.KafkaStreams;
@@ -17,18 +12,16 @@ import org.apache.kafka.streams.StreamsConfig;
 import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.KTable;
 
-import java.util.Collections;
-import java.util.Map;
 import java.util.Properties;
 
-public class EventStreamManager implements EventSerdes {
+public abstract class BaseStreamManager {
 
   private StreamerConfig configuration;
   private static final Integer DEFAULT_THREADS = 1;
   private static final Integer DEFAULT_REPLICATION_FACTOR = 1;
 
 
-  public EventStreamManager(StreamerConfig streamerConfig) {
+  protected BaseStreamManager(StreamerConfig streamerConfig) {
     this.configuration = streamerConfig;
   }
 
@@ -36,8 +29,8 @@ public class EventStreamManager implements EventSerdes {
 
     Properties streamsConfiguration = new Properties();
 
-    streamsConfiguration.put(StreamsConfig.APPLICATION_ID_CONFIG, "eventStreamer");
-    streamsConfiguration.put(StreamsConfig.CLIENT_ID_CONFIG, "eventStreamer-client");
+    streamsConfiguration.put(StreamsConfig.APPLICATION_ID_CONFIG, "web3monitoring-streamer");
+    streamsConfiguration.put(StreamsConfig.CLIENT_ID_CONFIG, "web3monitoring-streamer");
     streamsConfiguration.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, this.configuration.getKafkaServer());
     streamsConfiguration.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
 
@@ -69,25 +62,29 @@ public class EventStreamManager implements EventSerdes {
   }
 
 
+  protected void configureSerdes(String schemaRegistryUrl) {
+    Web3MonitoringSerdes.configureSerdes(configuration.getSchemaRegistryUrl());
+  }
+
+
   private KafkaStreams createStreams() {
+
 
     final StreamsBuilder builder = new StreamsBuilder();
 
-    Web3MonitoringSerdes.configureSerdes(configuration.getSchemaRegistryUrl());
+    configureSerdes(configuration.getSchemaRegistryUrl());
 
+    final KTable<String, BlockEvent> blockTable = Input.getBlockTable(configuration, builder);
+    KStream<String, ContractEvent> eventStream = Input.getEventStream(configuration, builder);
 
+    processStreams(eventStream, blockTable);
 
-    final KTable<String, BlockEvent> blockAvroStream = Input.getBlockTable(configuration, builder);
-
-    KStream<String, ContractEvent> contractEvents = Input.getEventStream(configuration, builder);
-    final KStream<String, ContractEvent> eventAvroStream = Filters.filterConfirmed(contractEvents);
-
-    KStream<String, EventBlock> eventBlockStream = Transformations.joinEventWithBlock(eventAvroStream, blockAvroStream);
-
-    Output.splitByEvent(eventBlockStream);
 
     return new KafkaStreams(builder.build(), this.getStreamConfiguration());
 
   }
+
+  protected abstract void processStreams( KStream<String, ContractEvent> eventStream,final KTable<String, BlockEvent> blockTable);
+
 
 }
