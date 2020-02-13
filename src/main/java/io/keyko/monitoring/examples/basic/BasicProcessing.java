@@ -31,9 +31,8 @@ public class BasicProcessing extends BaseStreamManager {
   public static void main(final String[] args) throws Exception {
 
     Config config = args.length > 0 ? ConfigFactory.load(args[0]) : ConfigFactory.load();
-    StreamerConfig streamerConfig = StreamerConfig.getInstance(config);
 
-    StreamerConfig streamerConfig = new StreamerConfig(config);
+    StreamerConfig streamerConfig = StreamerConfig.getInstance(config);
     new BasicProcessing(streamerConfig).initStream();
 
   }
