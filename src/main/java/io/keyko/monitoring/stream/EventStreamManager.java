@@ -83,17 +83,17 @@ public class EventStreamManager implements EventSerdes {
     viewBlockAvroSerde.configure(serdeConfig, false);
 
 
-    KStream<String, ContractEvent> contractEvents = builder.stream(configuration.getContractEventTopic(), Consumed.with(Serdes.String(), eventAvroSerde));
+    KStream<String, EventRecord> contractEvents = builder.stream(configuration.getContractEventTopic(), Consumed.with(Serdes.String(), eventAvroSerde));
 
-    final KStream<String, ContractEvent> eventAvroStream = eventProcessor.filterConfirmed(contractEvents);
+    final KStream<String, EventRecord> eventAvroStream = eventProcessor.filterConfirmed(contractEvents);
 
-    final KStream<String, ContractView> viewAvroStream = builder.stream(configuration.getContractViewTopic(), Consumed.with(Serdes.String(), viewAvroSerde));
+    final KStream<String, ViewRecord> viewAvroStream = builder.stream(configuration.getContractViewTopic(), Consumed.with(Serdes.String(), viewAvroSerde));
 
-    final KTable<String, BlockEvent> blockAvroStream = builder.table(configuration.getBlockEventTopic(), Consumed.with(Serdes.String(), blockAvroSerde));
+    final KTable<String, BlockRecord> blockAvroStream = builder.table(configuration.getBlockEventTopic(), Consumed.with(Serdes.String(), blockAvroSerde));
 
-    KStream<String, EventBlock> eventBlockStream = eventProcessor.joinEventWithBlock(eventAvroStream, blockAvroStream, eventAvroSerde, blockAvroSerde);
+    KStream<String, EventBlockRecord> eventBlockStream = eventProcessor.joinEventWithBlock(eventAvroStream, blockAvroStream, eventAvroSerde, blockAvroSerde);
 
-    KStream<String, ViewBlock> viewBlockStream = eventProcessor.joinViewWithBlock(viewAvroStream, blockAvroStream, viewAvroSerde, blockAvroSerde);
+    KStream<String, ViewBlockRecord> viewBlockStream = eventProcessor.joinViewWithBlock(viewAvroStream, blockAvroStream, viewAvroSerde, blockAvroSerde);
 
     eventProcessor.splitEventTopics(eventBlockStream, eventBlockAvroSerde);
 
