@@ -13,9 +13,9 @@ import io.keyko.monitoring.stream.BaseStreamManager;
 import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.KTable;
 
-public class BasicProcessing extends BaseStreamManager {
+public class BasicStreamManager extends BaseStreamManager {
 
-  public BasicProcessing(StreamerConfig config) {
+  public BasicStreamManager(StreamerConfig config) {
     super(config);
   }
 
@@ -33,7 +33,7 @@ public class BasicProcessing extends BaseStreamManager {
     Config config = args.length > 0 ? ConfigFactory.load(args[0]) : ConfigFactory.load();
 
     StreamerConfig streamerConfig = new StreamerConfig(config);
-    new BasicProcessing(streamerConfig).initStream();
+    new BasicStreamManager(streamerConfig).initStream();
 
   }
 }

@@ -30,7 +30,10 @@ public class Web3MonitoringSerdes {
     blockSerde.configure(serdeConfig, false);
     eventBlockSerde.configure(serdeConfig, false);
     alertSerde.configure(serdeConfig, false);
+  }
 
+  protected static void configureSerde(SpecificAvroSerde serde) {
+    serde.configure(serdeConfig, false);
   }
 
   public static SpecificAvroSerde<ContractEvent> getEventSerde() {
@@ -49,8 +52,6 @@ public class Web3MonitoringSerdes {
     return alertSerde;
   }
 
-  protected static void configureSerde(SpecificAvroSerde serde){
-    serde.configure(serdeConfig, false);
-  }
+
 
 }

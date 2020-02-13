@@ -17,6 +17,7 @@ import java.util.Properties;
 public abstract class BaseStreamManager {
 
   private StreamerConfig configuration;
+  protected StreamsBuilder builder;
   private static final Integer DEFAULT_THREADS = 1;
   private static final Integer DEFAULT_REPLICATION_FACTOR = 1;
 
@@ -61,24 +62,19 @@ public abstract class BaseStreamManager {
 
   }
 
-
   protected void configureSerdes(String schemaRegistryUrl) {
-    Web3MonitoringSerdes.configureSerdes(configuration.getSchemaRegistryUrl());
+    Web3MonitoringSerdes.configureSerdes(schemaRegistryUrl);
   }
-
 
   private KafkaStreams createStreams() {
 
-
-    final StreamsBuilder builder = new StreamsBuilder();
-
+    builder = new StreamsBuilder();
     configureSerdes(configuration.getSchemaRegistryUrl());
 
     final KTable<String, BlockEvent> blockTable = Input.getBlockTable(configuration, builder);
     KStream<String, ContractEvent> eventStream = Input.getEventStream(configuration, builder);
 
     processStreams(eventStream, blockTable);
-
 
     return new KafkaStreams(builder.build(), this.getStreamConfiguration());
 
