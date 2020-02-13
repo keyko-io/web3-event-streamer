@@ -2,10 +2,8 @@ package io.keyko.monitoring.stream;
 
 import io.confluent.kafka.serializers.AbstractKafkaAvroSerDeConfig;
 import io.keyko.monitoring.config.StreamerConfig;
+import io.keyko.monitoring.schemas.*;
 import io.keyko.monitoring.serde.EventSerdes;
-import io.keyko.monitoring.schemas.BlockEvent;
-import io.keyko.monitoring.schemas.ContractEvent;
-import io.keyko.monitoring.schemas.EventBlock;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.KafkaStreams;
@@ -79,19 +77,27 @@ public class EventStreamManager implements EventSerdes {
 
 
     eventAvroSerde.configure(serdeConfig, false);
+    viewAvroSerde.configure(serdeConfig, false);
     blockAvroSerde.configure(serdeConfig, false);
     eventBlockAvroSerde.configure(serdeConfig, false);
+    viewBlockAvroSerde.configure(serdeConfig, false);
 
 
     KStream<String, ContractEvent> contractEvents = builder.stream(configuration.getContractEventTopic(), Consumed.with(Serdes.String(), eventAvroSerde));
 
     final KStream<String, ContractEvent> eventAvroStream = eventProcessor.filterConfirmed(contractEvents);
 
+    final KStream<String, ContractView> viewAvroStream = builder.stream(configuration.getContractViewTopic(), Consumed.with(Serdes.String(), viewAvroSerde));
+
     final KTable<String, BlockEvent> blockAvroStream = builder.table(configuration.getBlockEventTopic(), Consumed.with(Serdes.String(), blockAvroSerde));
 
     KStream<String, EventBlock> eventBlockStream = eventProcessor.joinEventWithBlock(eventAvroStream, blockAvroStream, eventAvroSerde, blockAvroSerde);
 
-    eventProcessor.splitTopics(eventBlockStream, eventBlockAvroSerde);
+    KStream<String, ViewBlock> viewBlockStream = eventProcessor.joinViewWithBlock(viewAvroStream, blockAvroStream, viewAvroSerde, blockAvroSerde);
+
+    eventProcessor.splitEventTopics(eventBlockStream, eventBlockAvroSerde);
+
+    eventProcessor.splitViewTopics(viewBlockStream, viewBlockAvroSerde);
 
     return new KafkaStreams(builder.build(), this.getStreamConfiguration());
 

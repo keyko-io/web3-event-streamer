@@ -7,6 +7,7 @@ public class StreamerConfig {
   private static final String KAFKA_BOOTSTRAP_SERVER = "kafka.bootstrap-server";
   private static final String SCHEMA_REGISTRY_URL = "schema-registry.url";
   private static final String CONTRACT_EVENT_TOPIC = "kafka.contract-event-topic";
+  private static final String CONTRACT_VIEW_TOPIC = "kafka.contract-view-topic";
   private static final String BLOCK_TOPIC = "kafka.block-topic";
   private static final String EVENT_BLOCK_TOPIC = "kafka.event-block-topic";
   private static final String FLAT_EVENT_TOPIC = "kafka.flat-event-topic";
@@ -17,6 +18,7 @@ public class StreamerConfig {
   private String kafkaServer;
   private String schemaRegistryUrl;
   private String contractEventTopic;
+  private String contractViewTopic;
   private String blockEventTopic;
   private String eventBlockTopic;
   private String flatEventTopic;
@@ -34,6 +36,7 @@ public class StreamerConfig {
     streamerConfig.setKafkaServer(config.getString(KAFKA_BOOTSTRAP_SERVER));
     streamerConfig.setSchemaRegistryUrl(config.getString(SCHEMA_REGISTRY_URL));
     streamerConfig.setContractEventTopic(config.getString(CONTRACT_EVENT_TOPIC));
+    streamerConfig.setContractViewTopic(config.getString(CONTRACT_VIEW_TOPIC));
     streamerConfig.setBlockEventTopic(config.getString(BLOCK_TOPIC));
     streamerConfig.setEventBlockTopic(config.getString(EVENT_BLOCK_TOPIC));
     streamerConfig.setFlatEventTopic(config.getString(FLAT_EVENT_TOPIC));
@@ -66,6 +69,14 @@ public class StreamerConfig {
 
   public void setContractEventTopic(String contractEventTopic) {
     this.contractEventTopic = contractEventTopic;
+  }
+
+  public String getContractViewTopic() {
+    return contractViewTopic;
+  }
+
+  public void setContractViewTopic(String contractViewTopic) {
+    this.contractViewTopic = contractViewTopic;
   }
 
   public String getBlockEventTopic() {

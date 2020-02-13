@@ -1,8 +1,6 @@
 package io.keyko.monitoring.stream;
 
-import io.keyko.monitoring.schemas.BlockEvent;
-import io.keyko.monitoring.schemas.ContractEvent;
-import io.keyko.monitoring.schemas.EventBlock;
+import io.keyko.monitoring.schemas.*;
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.kstream.Joined;
@@ -29,10 +27,22 @@ public class EventProcessor {
    *
    * @param confirmedEvents Stream with the confirmed events
    */
-  public void splitTopics(KStream<String, EventBlock> confirmedEvents, Serde<EventBlock> eventBlockAvroSerde) {
+  public void splitEventTopics(KStream<String, EventBlock> confirmedEvents, Serde<EventBlock> eventBlockAvroSerde) {
     confirmedEvents.to((key, value, recordContext) ->
         value.getDetails().getName().toLowerCase(),
       Produced.with(Serdes.String(), eventBlockAvroSerde)
+    );
+  }
+
+  /**
+   * Sending confirmed events to a topic corresponding with the name of the event.
+   *
+   * @param confirmedEvents Stream with the confirmed events
+   */
+  public void splitViewTopics(KStream<String, ViewBlock> confirmedEvents, Serde<ViewBlock> viewBlockAvroSerde) {
+    confirmedEvents.to((key, value, recordContext) ->
+        value.getDetails().getName().toLowerCase(),
+      Produced.with(Serdes.String(), viewBlockAvroSerde)
     );
   }
 
@@ -41,6 +51,8 @@ public class EventProcessor {
    *
    * @param eventAvroStream Stream with the confirmed events
    * @param blockAvroStream Table with the blocks
+   * @param eventAvroSerde  Event avro serde
+   * @param blockAvroSerde  Block avro serde
    * @return KStream
    */
   public KStream<String, EventBlock> joinEventWithBlock(KStream<String, ContractEvent> eventAvroStream, KTable<String, BlockEvent> blockAvroStream,
@@ -62,6 +74,38 @@ public class EventProcessor {
         Joined.with(Serdes.String(), eventAvroSerde, blockAvroSerde)
       )
       .selectKey((key, event) -> event.getId());
+  }
+
+
+  /**
+   * Join the views with the corresponding block to track the timestamp of mining.
+   *
+   * @param viewAvroStream  Stream with the confirmed views
+   * @param blockAvroStream Table with the blocks
+   * @param viewAvroSerde   View avro serde
+   * @param blockAvroSerde  Block avro serde
+   * @return KStream
+   */
+  public KStream<String, ViewBlock> joinViewWithBlock(KStream<String, ContractView> viewAvroStream, KTable<String, BlockEvent> blockAvroStream,
+                                                      Serde<ContractView> viewAvroSerde, Serde<BlockEvent> blockAvroSerde) {
+    return viewAvroStream
+      .selectKey((key, view) -> view.getDetails().getBlockHash())
+      .join(blockAvroStream,
+        (view, block) -> {
+          ViewBlock viewBlock = new ViewBlock();
+
+          viewBlock.setDetails(view.getDetails());
+          viewBlock.setDetailsBlock(block.getDetails());
+          viewBlock.setId(view.getId());
+          viewBlock.setRetries(view.getRetries());
+          viewBlock.setType(view.getType());
+          return viewBlock;
+        },
+        Joined.with(Serdes.String(), viewAvroSerde, blockAvroSerde)
+      )
+      .selectKey((key, view) -> view.getId())
+      ;
+
   }
 
 }
