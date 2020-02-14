@@ -144,7 +144,7 @@
             </goals>
             <configuration>
               <shadedArtifactAttached>true</shadedArtifactAttached>
-              <finalName>${artifactId}</finalName>
+              <finalName>${project.artifactId}</finalName>
               <shadedClassifierName>allinone</shadedClassifierName>
               <artifactSet>
                 <includes>
@@ -186,8 +186,7 @@
         <configuration>
           <serverId>ossrh</serverId>
           <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-          <skipStaging>true</skipStaging>
-          <autoReleaseAfterClose>false</autoReleaseAfterClose>
+          <autoReleaseAfterClose>true</autoReleaseAfterClose>
         </configuration>
       </plugin>
 
@@ -262,6 +261,11 @@
       <id>ossrh</id>
       <url>https://oss.sonatype.org/content/repositories/snapshots</url>
     </snapshotRepository>
+    <repository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+    </repository>
+
   </distributionManagement>
 
 </project>
