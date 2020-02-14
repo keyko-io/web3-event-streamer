@@ -59,7 +59,7 @@ public class CeloStreamManager extends BaseStreamManager {
     Config config = args.length > 0 ? ConfigFactory.load(args[0]) : ConfigFactory.load();
 
     CeloConfig celoConfig = new CeloConfig(config);
-    new BasicStreamManager(celoConfig).initStream();
+    new CeloStreamManager(celoConfig).initStream();
 
   }
 }

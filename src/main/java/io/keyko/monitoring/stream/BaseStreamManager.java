@@ -30,8 +30,8 @@ public abstract class BaseStreamManager {
 
     Properties streamsConfiguration = new Properties();
 
-    streamsConfiguration.put(StreamsConfig.APPLICATION_ID_CONFIG, "web3monitoring-streamer");
-    streamsConfiguration.put(StreamsConfig.CLIENT_ID_CONFIG, "web3monitoring-streamer");
+    streamsConfiguration.put(StreamsConfig.APPLICATION_ID_CONFIG, "web3monitoring-streamer_1");
+    streamsConfiguration.put(StreamsConfig.CLIENT_ID_CONFIG, "web3monitoring-streamer_1");
     streamsConfiguration.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, this.configuration.getKafkaServer());
     streamsConfiguration.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
 
