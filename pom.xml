@@ -20,7 +20,7 @@
     <org.json.version>20190722</org.json.version>
     <typesafe.config.version>1.4.0</typesafe.config.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <keyko.schemas.version>0.2.0</keyko.schemas.version>
+    <keyko.schemas.version>0.2.1</keyko.schemas.version>
     <junit.version>4.4</junit.version>
   </properties>
 
@@ -151,18 +151,6 @@
                   <include>*:*</include>
                 </includes>
               </artifactSet>
-              <transformers>
-                <transformer
-                  implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
-                  <resource>reference.conf</resource>
-                </transformer>
-                <transformer
-                  implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                  <manifestEntries>
-                    <Main-Class>io.keyko.monitoring.KeykoMonitoring</Main-Class>
-                  </manifestEntries>
-                </transformer>
-              </transformers>
             </configuration>
           </execution>
         </executions>
