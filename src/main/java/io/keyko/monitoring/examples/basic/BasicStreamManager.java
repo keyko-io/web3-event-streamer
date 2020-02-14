@@ -6,9 +6,9 @@ import io.keyko.monitoring.config.StreamerConfig;
 import io.keyko.monitoring.postprocessing.Output;
 import io.keyko.monitoring.preprocessing.Filters;
 import io.keyko.monitoring.preprocessing.Transformations;
-import io.keyko.monitoring.schemas.BlockEvent;
-import io.keyko.monitoring.schemas.ContractEvent;
-import io.keyko.monitoring.schemas.EventBlock;
+import io.keyko.monitoring.schemas.BlockRecord;
+import io.keyko.monitoring.schemas.EventRecord;
+import io.keyko.monitoring.schemas.EventBlockRecord;
 import io.keyko.monitoring.stream.BaseStreamManager;
 import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.KTable;
@@ -20,10 +20,10 @@ public class BasicStreamManager extends BaseStreamManager {
   }
 
   @Override
-  protected void processStreams(KStream<String, ContractEvent> eventStream, KTable<String, BlockEvent> blockTable) {
+  protected void processStreams(KStream<String, EventRecord> eventStream, KTable<String, BlockRecord> blockTable) {
 
-    final KStream<String, ContractEvent> eventAvroStream = Filters.filterConfirmed(eventStream);
-    KStream<String, EventBlock> eventBlockStream = Transformations.joinEventWithBlock(eventAvroStream, blockTable);
+    final KStream<String, EventRecord> eventAvroStream = Filters.filterConfirmed(eventStream);
+    KStream<String, EventBlockRecord> eventBlockStream = Transformations.joinEventWithBlock(eventAvroStream, blockTable);
     Output.splitByEvent(eventBlockStream);
 
   }

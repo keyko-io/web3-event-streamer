@@ -2,10 +2,10 @@ package io.keyko.monitoring.serde;
 
 import io.confluent.kafka.serializers.AbstractKafkaAvroSerDeConfig;
 import io.confluent.kafka.streams.serdes.avro.SpecificAvroSerde;
-import io.keyko.monitoring.schemas.AlertEvent;
-import io.keyko.monitoring.schemas.BlockEvent;
-import io.keyko.monitoring.schemas.ContractEvent;
-import io.keyko.monitoring.schemas.EventBlock;
+import io.keyko.monitoring.schemas.AlertRecord;
+import io.keyko.monitoring.schemas.BlockRecord;
+import io.keyko.monitoring.schemas.EventRecord;
+import io.keyko.monitoring.schemas.EventBlockRecord;
 
 import java.util.Collections;
 import java.util.Map;
@@ -14,10 +14,10 @@ import java.util.Map;
 public class Web3MonitoringSerdes {
 
 
-  private final static SpecificAvroSerde<ContractEvent> eventSerde = new SpecificAvroSerde<>();
-  private final static SpecificAvroSerde<BlockEvent> blockSerde = new SpecificAvroSerde<>();
-  private final static SpecificAvroSerde<EventBlock> eventBlockSerde = new SpecificAvroSerde<>();
-  private final static SpecificAvroSerde<AlertEvent> alertSerde = new SpecificAvroSerde<>();
+  private final static SpecificAvroSerde<EventRecord> eventSerde = new SpecificAvroSerde<>();
+  private final static SpecificAvroSerde<BlockRecord> blockSerde = new SpecificAvroSerde<>();
+  private final static SpecificAvroSerde<EventBlockRecord> eventBlockSerde = new SpecificAvroSerde<>();
+  private final static SpecificAvroSerde<AlertRecord> alertSerde = new SpecificAvroSerde<>();
 
   protected static Map<String, String> serdeConfig;
 
@@ -36,19 +36,19 @@ public class Web3MonitoringSerdes {
     serde.configure(serdeConfig, false);
   }
 
-  public static SpecificAvroSerde<ContractEvent> getEventSerde() {
+  public static SpecificAvroSerde<EventRecord> getEventSerde() {
     return eventSerde;
   }
 
-  public static SpecificAvroSerde<BlockEvent> getBlockSerde() {
+  public static SpecificAvroSerde<BlockRecord> getBlockSerde() {
     return blockSerde;
   }
 
-  public static SpecificAvroSerde<EventBlock> getEventBlockSerde() {
+  public static SpecificAvroSerde<EventBlockRecord> getEventBlockSerde() {
     return eventBlockSerde;
   }
 
-  public static SpecificAvroSerde<AlertEvent> getAlertSerde() {
+  public static SpecificAvroSerde<AlertRecord> getAlertSerde() {
     return alertSerde;
   }
 

@@ -1,8 +1,8 @@
 package io.keyko.monitoring.preprocessing;
 
-import io.keyko.monitoring.schemas.BlockEvent;
-import io.keyko.monitoring.schemas.ContractEvent;
-import io.keyko.monitoring.schemas.EventBlock;
+import io.keyko.monitoring.schemas.BlockRecord;
+import io.keyko.monitoring.schemas.EventRecord;
+import io.keyko.monitoring.schemas.EventBlockRecord;
 import io.keyko.monitoring.serde.Web3MonitoringSerdes;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.kstream.Joined;
@@ -18,12 +18,12 @@ public class Transformations {
    * @param blockAvroStream Table with the blocks
    * @return KStream
    */
-  public static KStream<String, EventBlock> joinEventWithBlock(KStream<String, ContractEvent> eventAvroStream, KTable<String, BlockEvent> blockAvroStream) {
+  public static KStream<String, EventBlockRecord> joinEventWithBlock(KStream<String, EventRecord> eventAvroStream, KTable<String, BlockRecord> blockAvroStream) {
     return eventAvroStream
       .selectKey((key, event) -> event.getDetails().getBlockHash())
       .join(blockAvroStream,
         (event, block) -> {
-          EventBlock eventblock = new EventBlock();
+          EventBlockRecord eventblock = new EventBlockRecord();
 
           eventblock.setDetails(event.getDetails());
           eventblock.setDetailsBlock(block.getDetails());

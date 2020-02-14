@@ -2,8 +2,8 @@ package io.keyko.monitoring.stream;
 
 import io.keyko.monitoring.config.StreamerConfig;
 import io.keyko.monitoring.preprocessing.Input;
-import io.keyko.monitoring.schemas.BlockEvent;
-import io.keyko.monitoring.schemas.ContractEvent;
+import io.keyko.monitoring.schemas.BlockRecord;
+import io.keyko.monitoring.schemas.EventRecord;
 import io.keyko.monitoring.serde.Web3MonitoringSerdes;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.streams.KafkaStreams;
@@ -71,8 +71,8 @@ public abstract class BaseStreamManager {
     builder = new StreamsBuilder();
     configureSerdes(configuration.getSchemaRegistryUrl());
 
-    final KTable<String, BlockEvent> blockTable = Input.getBlockTable(configuration, builder);
-    KStream<String, ContractEvent> eventStream = Input.getEventStream(configuration, builder);
+    final KTable<String, BlockRecord> blockTable = Input.getBlockTable(configuration, builder);
+    KStream<String, EventRecord> eventStream = Input.getEventStream(configuration, builder);
 
     processStreams(eventStream, blockTable);
 
@@ -80,7 +80,7 @@ public abstract class BaseStreamManager {
 
   }
 
-  protected abstract void processStreams( KStream<String, ContractEvent> eventStream,final KTable<String, BlockEvent> blockTable);
+  protected abstract void processStreams( KStream<String, EventRecord> eventStream,final KTable<String, BlockRecord> blockTable);
 
 
 }

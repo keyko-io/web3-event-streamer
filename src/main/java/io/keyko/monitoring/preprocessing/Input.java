@@ -1,8 +1,8 @@
 package io.keyko.monitoring.preprocessing;
 
 import io.keyko.monitoring.config.StreamerConfig;
-import io.keyko.monitoring.schemas.BlockEvent;
-import io.keyko.monitoring.schemas.ContractEvent;
+import io.keyko.monitoring.schemas.BlockRecord;
+import io.keyko.monitoring.schemas.EventRecord;
 import io.keyko.monitoring.serde.Web3MonitoringSerdes;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.StreamsBuilder;
@@ -12,11 +12,11 @@ import org.apache.kafka.streams.kstream.KTable;
 
 public class Input {
 
-  public static KStream<String, ContractEvent> getEventStream(StreamerConfig configuration, StreamsBuilder builder) {
+  public static KStream<String, EventRecord> getEventStream(StreamerConfig configuration, StreamsBuilder builder) {
     return builder.stream(configuration.getContractEventTopic(), Consumed.with(Serdes.String(), Web3MonitoringSerdes.getEventSerde()));
   }
 
-  public static KTable<String, BlockEvent> getBlockTable(StreamerConfig configuration, StreamsBuilder builder) {
+  public static KTable<String, BlockRecord> getBlockTable(StreamerConfig configuration, StreamsBuilder builder) {
     return builder.table(configuration.getBlockEventTopic(), Consumed.with(Serdes.String(), Web3MonitoringSerdes.getBlockSerde()));
   }
 }

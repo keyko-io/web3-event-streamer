@@ -2,15 +2,14 @@ package io.keyko.monitoring.examples.celo;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
-import io.keyko.monitoring.examples.basic.BasicStreamManager;
 import io.keyko.monitoring.examples.celo.model.AccountCreatedAggregation;
 import io.keyko.monitoring.postprocessing.Output;
 import io.keyko.monitoring.preprocessing.Filters;
 import io.keyko.monitoring.preprocessing.Transformations;
-import io.keyko.monitoring.schemas.AlertEvent;
-import io.keyko.monitoring.schemas.BlockEvent;
-import io.keyko.monitoring.schemas.ContractEvent;
-import io.keyko.monitoring.schemas.EventBlock;
+import io.keyko.monitoring.schemas.AlertRecord;
+import io.keyko.monitoring.schemas.BlockRecord;
+import io.keyko.monitoring.schemas.EventRecord;
+import io.keyko.monitoring.schemas.EventBlockRecord;
 import io.keyko.monitoring.serde.JsonPOJOSerde;
 import io.keyko.monitoring.stream.BaseStreamManager;
 import org.apache.kafka.common.serialization.Serdes;
@@ -37,10 +36,10 @@ public class CeloStreamManager extends BaseStreamManager {
   }
 
   @Override
-  protected void processStreams(KStream<String, ContractEvent> eventStream, KTable<String, BlockEvent> blockTable) {
+  protected void processStreams(KStream<String, EventRecord> eventStream, KTable<String, BlockRecord> blockTable) {
 
-    final KStream<String, ContractEvent> eventAvroStream = Filters.filterConfirmed(eventStream);
-    KStream<String, EventBlock> eventBlockStream = Transformations.joinEventWithBlock(eventAvroStream, blockTable);
+    final KStream<String, EventRecord> eventAvroStream = Filters.filterConfirmed(eventStream);
+    KStream<String, EventBlockRecord> eventBlockStream = Transformations.joinEventWithBlock(eventAvroStream, blockTable);
     Output.splitByEvent(eventBlockStream);
 
     /* Celo demo */
@@ -49,7 +48,7 @@ public class CeloStreamManager extends BaseStreamManager {
     KStream<String, AccountCreatedAggregation> accountsCreatedDayStream = CeloProcessor.accountDailyAggregation(accountsTopics, builder);
     accountsCreatedDayStream.to(celoConfig.getAccountsAggregationTopic(), Produced.with(Serdes.String(), new JsonPOJOSerde<AccountCreatedAggregation>(AccountCreatedAggregation.class)));
 
-    KStream<String, AlertEvent> alertEventKStream = CeloProcessor.alertNoEpochRewardsDistributed(builder, Collections.singletonList("EpochRewardsDistributedToVoters".toLowerCase()));
+    KStream<String, AlertRecord> alertEventKStream = CeloProcessor.alertNoEpochRewardsDistributed(builder, Collections.singletonList("EpochRewardsDistributedToVoters".toLowerCase()));
     alertEventKStream.to(celoConfig.getAlertsTopic(), Produced.with(Serdes.String(), CeloSerdes.getAlertAvroSerde()));
 
   }

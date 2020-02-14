@@ -32,7 +32,7 @@ public class CeloProcessor {
 
     List<String> accountsTopics = topicsToAggregate;//, "VoteSignerAuthorized".toLowerCase(), "AttestationSignerAuthorized".toLowerCase());
 
-    KStream<String, EventBlock> accountsCreatedStream = builder.stream(accountsTopics,
+    KStream<String, EventBlockRecord> accountsCreatedStream = builder.stream(accountsTopics,
       Consumed.with(Serdes.String(), CeloSerdes.getEventBlockSerde())
         .withTimestampExtractor(new EventBlockTimestampExtractor()));
 
@@ -88,12 +88,12 @@ public class CeloProcessor {
 
   }
 
-  public static KStream<String, AlertEvent> alertNoEpochRewardsDistributed(StreamsBuilder builder, List<String> EpochRewardsDistributedToVoters) {
+  public static KStream<String, AlertRecord> alertNoEpochRewardsDistributed(StreamsBuilder builder, List<String> EpochRewardsDistributedToVoters) {
     return builder.stream(EpochRewardsDistributedToVoters, Consumed.with(Serdes.String(), CeloSerdes.getEventBlockSerde()))
       .filter((key, event) -> ((NumberParameter) event.getDetails().getNonIndexedParameters().get(0)).getValue().equals("0"))
       .map((key, event) ->
         KeyValue.pair(key,
-          AlertEvent.newBuilder()
+          AlertRecord.newBuilder()
             .setName("alertNoEpochRewardsDistributed")
             .setReference(event.getId())
             .setStatus(AlertEventStatus.ERROR)
