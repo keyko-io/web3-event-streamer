@@ -171,7 +171,7 @@
             <phase>package</phase>
             <configuration>
               <target>
-                <copy file="target/${project.artifactId}-${project.version}.jar" tofile="target/dependency/${project.artifactId}-${project.version}.jar"/>
+                <move file="target/${project.artifactId}.jar" tofile="target/fat-jar/${project.artifactId}-${project.version}-allinone.jar"/>
               </target>
             </configuration>
             <goals>
