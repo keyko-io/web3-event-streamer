@@ -129,7 +129,39 @@
 
 
   <build>
+    <finalName>${project.artifactId}-${project.version}</finalName>
     <plugins>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>1.8</version>
+        <executions>
+          <execution>
+            <id>generate-sources</id>
+            <phase>generate-sources</phase>
+            <configuration>
+              <target>
+                <mkdir dir="target/fatjar"/>
+              </target>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+<!--          <execution>
+            <phase>package</phase>
+            <configuration>
+              <target>
+                <move file="target/${project.artifactId}.jar" tofile="target/fat-jar/${project.artifactId}-${project.version}-allinone.jar"/>
+              </target>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>-->
+        </executions>
+      </plugin>
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -143,7 +175,7 @@
             </goals>
             <configuration>
               <shadedArtifactAttached>true</shadedArtifactAttached>
-              <finalName>${project.artifactId}-${project.version}-allinone</finalName>
+              <finalName>fatjar/${project.artifactId}-${project.version}-allinone</finalName>
               <shadedClassifierName>allinone</shadedClassifierName>
               <artifactSet>
                 <includes>
@@ -162,24 +194,7 @@
           <release>11</release>
         </configuration>
       </plugin>
-     <!-- <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-antrun-plugin</artifactId>
-        <version>1.8</version>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <configuration>
-              <target>
-                <move file="target/${project.artifactId}.jar" tofile="target/fat-jar/${project.artifactId}-${project.version}-allinone.jar"/>
-              </target>
-            </configuration>
-            <goals>
-              <goal>run</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>-->
+
       <plugin>
         <!--
            See https://wiki.jasig.org/display/LIC/maven-notice-plugin
