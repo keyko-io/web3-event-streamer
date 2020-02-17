@@ -13,14 +13,14 @@ public class Transformations {
   /**
    * Join the events with the corresponding block to track the timestamp of mining.
    *
-   * @param eventAvroStream Stream with the confirmed events
-   * @param blockAvroStream Table with the blocks
+   * @param eventStream Stream with the confirmed events
+   * @param blockStream Table with the blocks
    * @return KStream
    */
-  public static KStream<String, EventBlockRecord> joinEventWithBlock(KStream<String, EventRecord> eventAvroStream, KTable<String, BlockRecord> blockAvroStream) {
-    return eventAvroStream
+  public static KStream<String, EventBlockRecord> joinEventWithBlock(KStream<String, EventRecord> eventStream, KTable<String, BlockRecord> blockStream) {
+    return eventStream
       .selectKey((key, event) -> event.getDetails().getBlockHash())
-      .join(blockAvroStream,
+      .join(blockStream,
         (event, block) -> {
           EventBlockRecord eventblock = new EventBlockRecord();
 
@@ -40,15 +40,15 @@ public class Transformations {
   /**
    * Join the views with the corresponding block to track the timestamp of mining.
    *
-   * @param viewAvroStream  Stream with the confirmed views
-   * @param blockAvroStream Table with the blocks
+   * @param viewStream  Stream with the confirmed views
+   * @param blockStream Table with the blocks
    * @return KStream
    * */
 
-  public static KStream<String, ViewBlockRecord> joinViewWithBlock(KStream<String, ViewRecord> viewAvroStream, KTable<String, BlockRecord> blockAvroStream) {
-    return viewAvroStream
+  public static KStream<String, ViewBlockRecord> joinViewWithBlock(KStream<String, ViewRecord> viewStream, KTable<String, BlockRecord> blockStream) {
+    return viewStream
       .selectKey((key, view) -> view.getDetails().getBlockHash())
-      .join(blockAvroStream,
+      .join(blockStream,
         (view, block) -> {
           ViewBlockRecord viewBlock = new ViewBlockRecord();
 
