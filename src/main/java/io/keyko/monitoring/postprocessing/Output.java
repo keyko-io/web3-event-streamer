@@ -38,7 +38,7 @@ public class Output {
    */
   public static void splitByView(KStream<String, ViewBlockRecord> views, String suffix) {
     views.to((key, value, recordContext) ->
-        "w3m-".concat(value.getDetails().getName().toLowerCase()).concat(suffix),
+        "w3m-".concat(value.getDetails().getContractName().toLowerCase()).concat("-").concat(value.getDetails().getName().toLowerCase()).concat(suffix),
       Produced.with(Serdes.String(), Web3MonitoringSerdes.getViewBlockSerde())
     );
   }
