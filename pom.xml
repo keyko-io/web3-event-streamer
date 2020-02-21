@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.keyko.monitoring</groupId>
   <artifactId>web3-event-streamer</artifactId>
-  <version>0.1.1</version>
+  <version>0.1.2</version>
   <name>Web3 Monitoring Event Streamer</name>
   <url>https://github.com/keyko-io/web3-event-streamer</url>
   <inceptionYear>2019</inceptionYear>
@@ -20,7 +20,7 @@
     <org.json.version>20190722</org.json.version>
     <typesafe.config.version>1.4.0</typesafe.config.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <keyko.schemas.version>0.2.1</keyko.schemas.version>
+    <keyko.schemas.version>0.2.2</keyko.schemas.version>
     <junit.version>4.4</junit.version>
   </properties>
 
