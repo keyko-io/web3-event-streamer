@@ -2,7 +2,6 @@ package io.keyko.monitoring.preprocessing;
 
 import io.keyko.monitoring.schemas.*;
 import io.keyko.monitoring.serde.Web3MonitoringSerdes;
-import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.kstream.Joined;
 import org.apache.kafka.streams.kstream.KStream;
@@ -45,7 +44,7 @@ public class Transformations {
    * @param viewStream  Stream with the confirmed views
    * @param blockStream Table with the blocks
    * @return KStream
-   * */
+   */
 
   public static KStream<String, ViewBlockRecord> joinViewWithBlock(KStream<String, ViewRecord> viewStream, KTable<String, BlockRecord> blockStream) {
     return viewStream
@@ -68,34 +67,40 @@ public class Transformations {
 
   }
 
-  public static KStream<String, TimeSeriesRecord>  transformToTimeSeries(KStream<String, ViewBlockRecord> stream) {
+  /**
+   * Transform the ViewBlock records into a TimeSeriesRecord
+   *
+   * @param stream
+   * @return
+   */
+  public static KStream<String, TimeSeriesRecord> transformToTimeSeries(KStream<String, ViewBlockRecord> stream) {
 
-    return stream.mapValues( viewBlock -> {
+    return stream.mapValues(viewBlock -> {
 
-      List output = viewBlock.getDetails().getOutput();
+      List<Object> output = viewBlock.getDetails().getOutput();
 
       TimeSeriesRecord timeSeries = new TimeSeriesRecord();
       timeSeries.setContractName(viewBlock.getDetails().getContractName());
-      timeSeries.setMethodName (viewBlock.getDetails().getName());
+      timeSeries.setMethodName(viewBlock.getDetails().getName());
       timeSeries.setTimestamp(viewBlock.getDetailsBlock().getTimestamp());
       timeSeries.setBlockNumber(viewBlock.getDetailsBlock().getNumber());
 
-      for (int i= 0; i< output.size(); i++) {
+      for (int i = 0; i < output.size(); i++) {
 
         Object object = output.get(i);
-        NumberParameter numberParameter = object instanceof NumberParameter? (NumberParameter) object: null;
-        StringParameter stringParameter = object instanceof StringParameter? (StringParameter) object: null;
+        NumberParameter numberParameter = object instanceof NumberParameter ? (NumberParameter) object : null;
+        StringParameter stringParameter = object instanceof StringParameter ? (StringParameter) object : null;
 
         TimeSeriesParameter param = new TimeSeriesParameter();
 
-        if (stringParameter!= null){
+        if (stringParameter != null) {
           param.setLabel(stringParameter.getName());
           param.setValue(stringParameter.getValue());
-          param.setNumberValue(0l);
-        }else if (numberParameter!= null){
+          param.setNumberValue(0L);
+        } else if (numberParameter != null) {
           param.setLabel(numberParameter.getName());
           param.setValue(numberParameter.getValue());
-          param.setNumberValue( numberParameter.getNumberValue());
+          param.setNumberValue(numberParameter.getNumberValue());
         }
         switch(i) {
           case 0: timeSeries.setParam0(param); break;
@@ -117,4 +122,57 @@ public class Transformations {
 
   }
 
+  /**
+   * Transform the EventBlock records into a TimeSeriesRecord
+   *
+   * @param stream
+   * @return
+   */
+  public static KStream<String, TimeSeriesRecord> transformEventToTimeSeries(KStream<String, EventBlockRecord> stream) {
+    return stream.mapValues(eventBlock -> {
+
+      List<Object> output = eventBlock.getDetails().getIndexedParameters();
+      output.addAll(eventBlock.getDetails().getNonIndexedParameters());
+
+      TimeSeriesRecord timeSeries = new TimeSeriesRecord();
+      timeSeries.setContractName(eventBlock.getDetails().getContractName());
+      timeSeries.setMethodName(eventBlock.getDetails().getName());
+      timeSeries.setTimestamp(eventBlock.getDetailsBlock().getTimestamp());
+      timeSeries.setBlockNumber(eventBlock.getDetailsBlock().getNumber());
+
+      for (int i = 0; i < output.size(); i++) {
+
+        Object object = output.get(i);
+        NumberParameter numberParameter = object instanceof NumberParameter ? (NumberParameter) object : null;
+        StringParameter stringParameter = object instanceof StringParameter ? (StringParameter) object : null;
+
+        TimeSeriesParameter param = new TimeSeriesParameter();
+
+        if (stringParameter != null) {
+          param.setLabel(stringParameter.getName());
+          param.setValue(stringParameter.getValue());
+          param.setNumberValue(0L);
+        } else if (numberParameter != null) {
+          param.setLabel(numberParameter.getName());
+          param.setValue(numberParameter.getValue());
+          param.setNumberValue(numberParameter.getNumberValue());
+        }
+        switch(i) {
+          case 0: timeSeries.setParam0(param); break;
+          case 1: timeSeries.setParam1(param); break;
+          case 2: timeSeries.setParam2(param); break;
+          case 3: timeSeries.setParam3(param); break;
+          case 4: timeSeries.setParam4(param); break;
+          case 5: timeSeries.setParam5(param); break;
+          case 6: timeSeries.setParam6(param); break;
+          case 7: timeSeries.setParam7(param); break;
+          case 8: timeSeries.setParam8(param); break;
+          case 9: timeSeries.setParam9(param); break;
+          default: break;
+        }
+      }
+      return timeSeries;
+
+    });
+  }
 }
