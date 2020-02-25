@@ -8,6 +8,8 @@ import org.apache.kafka.streams.kstream.Joined;
 import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.KTable;
 
+import java.util.List;
+
 public class Transformations {
 
   /**
@@ -66,5 +68,53 @@ public class Transformations {
 
   }
 
+  public static KStream<String, TimeSeriesRecord>  transformToTimeSeries(KStream<String, ViewBlockRecord> stream) {
+
+    return stream.mapValues( viewBlock -> {
+
+      List output = viewBlock.getDetails().getOutput();
+
+      TimeSeriesRecord timeSeries = new TimeSeriesRecord();
+      timeSeries.setContractName(viewBlock.getDetails().getContractName());
+      timeSeries.setMethodName (viewBlock.getDetails().getName());
+      timeSeries.setTimestamp(viewBlock.getDetailsBlock().getTimestamp());
+      timeSeries.setBlockNumber(viewBlock.getDetailsBlock().getNumber());
+
+      for (int i= 0; i< output.size(); i++) {
+
+        Object object = output.get(i);
+        NumberParameter numberParameter = object instanceof NumberParameter? (NumberParameter) object: null;
+        StringParameter stringParameter = object instanceof StringParameter? (StringParameter) object: null;
+
+        TimeSeriesParameter param = new TimeSeriesParameter();
+
+        if (stringParameter!= null){
+          param.setLabel(stringParameter.getName());
+          param.setValue(stringParameter.getValue());
+          param.setNumberValue(0l);
+        }else if (numberParameter!= null){
+          param.setLabel(numberParameter.getName());
+          param.setValue(numberParameter.getValue());
+          param.setNumberValue( numberParameter.getNumberValue());
+        }
+        switch(i) {
+          case 0: timeSeries.setParam0(param); break;
+          case 1: timeSeries.setParam1(param); break;
+          case 2: timeSeries.setParam2(param); break;
+          case 3: timeSeries.setParam3(param); break;
+          case 4: timeSeries.setParam4(param); break;
+          case 5: timeSeries.setParam5(param); break;
+          case 6: timeSeries.setParam6(param); break;
+          case 7: timeSeries.setParam7(param); break;
+          case 8: timeSeries.setParam8(param); break;
+          case 9: timeSeries.setParam9(param); break;
+          default: break;
+        }
+      }
+      return timeSeries;
+
+    });
+
+  }
 
 }
