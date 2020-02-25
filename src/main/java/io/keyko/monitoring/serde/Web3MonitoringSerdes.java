@@ -17,6 +17,7 @@ public class Web3MonitoringSerdes {
   private final static SpecificAvroSerde<AlertRecord> alertSerde = new SpecificAvroSerde<>();
   private final static SpecificAvroSerde<ViewRecord> viewSerde = new SpecificAvroSerde<>();
   private final static SpecificAvroSerde<ViewBlockRecord> viewBlockSerde = new SpecificAvroSerde<>();
+  private final static SpecificAvroSerde<TimeSeriesRecord> timeSeriesSerde = new SpecificAvroSerde<>();
 
   protected static Map<String, String> serdeConfig;
 
@@ -31,6 +32,7 @@ public class Web3MonitoringSerdes {
     alertSerde.configure(serdeConfig, false);
     viewSerde.configure(serdeConfig, false);
     viewBlockSerde.configure(serdeConfig, false);
+    timeSeriesSerde.configure(serdeConfig, false);
   }
 
   protected static void configureSerde(SpecificAvroSerde serde) {
@@ -56,6 +58,9 @@ public class Web3MonitoringSerdes {
   public static SpecificAvroSerde<ViewRecord> getViewSerde() { return viewSerde; }
 
   public static SpecificAvroSerde<ViewBlockRecord> getViewBlockSerde() { return viewBlockSerde; }
+
+  public static SpecificAvroSerde<TimeSeriesRecord> getTimeSerieserde() { return timeSeriesSerde; }
+
 
 
 }

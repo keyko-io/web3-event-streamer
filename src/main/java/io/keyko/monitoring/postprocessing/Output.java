@@ -1,6 +1,7 @@
 package io.keyko.monitoring.postprocessing;
 
 import io.keyko.monitoring.schemas.EventBlockRecord;
+import io.keyko.monitoring.schemas.TimeSeriesRecord;
 import io.keyko.monitoring.schemas.ViewBlockRecord;
 import io.keyko.monitoring.serde.Web3MonitoringSerdes;
 import org.apache.kafka.common.serialization.Serde;
@@ -45,6 +46,18 @@ public class Output {
 
   public static void splitByView(KStream<String, ViewBlockRecord> views) {
     splitByView(views, "");
+  }
+
+
+  public static void splitByTimeSeries(KStream<String, TimeSeriesRecord> ts, String suffix) {
+    ts.to((key, value, recordContext) ->
+        "w3m-".concat(value.getContractName().toLowerCase()).concat("-").concat(value.getMethodName().toLowerCase()).concat("_TS").concat(suffix),
+      Produced.with(Serdes.String(), Web3MonitoringSerdes.getTimeSerieserde())
+    );
+  }
+
+  public static void splitByTimeSeries(KStream<String, TimeSeriesRecord> ts) {
+    splitByTimeSeries(ts, "");
   }
 
 
