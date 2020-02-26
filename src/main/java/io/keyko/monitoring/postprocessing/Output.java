@@ -51,7 +51,7 @@ public class Output {
 
   public static void splitByTimeSeries(KStream<String, TimeSeriesRecord> ts, String suffix) {
     ts.to((key, value, recordContext) ->
-        "w3m-".concat(value.getContractName().toLowerCase()).concat("-").concat(value.getMethodName().toLowerCase()).concat("_TS").concat(suffix),
+        "w3m-".concat(value.getContractName().toLowerCase()).concat("-").concat(value.getMethodName().toLowerCase()).concat("_ts").concat(suffix),
       Produced.with(Serdes.String(), Web3MonitoringSerdes.getTimeSerieserde())
     );
   }
