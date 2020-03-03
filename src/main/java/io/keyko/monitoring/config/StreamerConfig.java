@@ -2,16 +2,22 @@ package io.keyko.monitoring.config;
 
 import com.typesafe.config.Config;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
+
 public class StreamerConfig {
 
   private static final String KAFKA_BOOTSTRAP_SERVER = "kafka.bootstrap-server";
   private static final String SCHEMA_REGISTRY_URL = "schema-registry.url";
-  private static final String EVENT_TOPIC = "kafka.event-topic";
-  private static final String VIEW_TOPIC = "kafka.view-topic";
-  private static final String BLOCK_TOPIC = "kafka.block-topic";
-  private static final String EVENT_BLOCK_TOPIC = "kafka.event-block-topic";
-  private static final String FLAT_EVENT_TOPIC = "kafka.flat-event-topic";
-  private static final String ALERTS_TOPIC = "kafka.alert-topic";
+  private static final String EVENT_TOPIC = "kafka.topics.event-topic";
+  private static final String VIEW_TOPIC = "kafka.topics.view-topic";
+  private static final String BLOCK_TOPIC = "kafka.topics.block-topic";
+  private static final String EVENT_BLOCK_TOPIC = "kafka.topics.event-block-topic";
+  private static final String FLAT_EVENT_TOPIC = "kafka.topics.flat-event-topic";
+  private static final String ALERTS_TOPIC = "kafka.topics.alert-topic";
+  private static final String ALL_TOPICS = "kafka.topics";
 
   private String kafkaServer;
   private String schemaRegistryUrl;
@@ -21,6 +27,7 @@ public class StreamerConfig {
   private String eventBlockTopic;
   private String flatEventTopic;
   private String alertsTopic;
+  private List<String> topicList;
 
 
   public StreamerConfig(Config config) {
@@ -33,7 +40,7 @@ public class StreamerConfig {
     this.setEventBlockTopic(config.getString(EVENT_BLOCK_TOPIC));
     this.setFlatEventTopic(config.getString(FLAT_EVENT_TOPIC));
     this.setAlertsTopic(config.getString(ALERTS_TOPIC));
-
+    this.setAllTopics(config.getConfig(ALL_TOPICS).root().unwrapped().values());
   }
 
   public String getKafkaServer() {
@@ -98,6 +105,18 @@ public class StreamerConfig {
 
   public void setAlertsTopic(String alertsTopic) {
     this.alertsTopic = alertsTopic;
+  }
+
+  public List<String> getAllTopics() {
+    return topicList;
+  }
+
+  public void setAllTopics(Collection<Object> values) {
+    List<String> list = new ArrayList<>();
+    for (Object i : values) {
+      list.add(i.toString());
+    }
+    this.topicList = list;
   }
 
 }

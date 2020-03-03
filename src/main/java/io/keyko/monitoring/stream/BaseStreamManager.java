@@ -3,6 +3,7 @@ package io.keyko.monitoring.stream;
 import io.keyko.monitoring.config.StreamerConfig;
 
 import io.keyko.monitoring.preprocessing.Input;
+import io.keyko.monitoring.preprocessing.TopicCreation;
 import io.keyko.monitoring.schemas.BlockRecord;
 import io.keyko.monitoring.schemas.EventRecord;
 import io.keyko.monitoring.schemas.ViewRecord;
@@ -54,6 +55,7 @@ public abstract class BaseStreamManager {
 
   public void initStream() throws Exception {
 
+    createTopics();
     KafkaStreams streams = createStreams();
 
     streams.cleanUp();
@@ -80,6 +82,11 @@ public abstract class BaseStreamManager {
     processStreams(eventStream, viewStream, blockTable);
 
     return new KafkaStreams(builder.build(), this.getStreamConfiguration());
+
+  }
+
+  private void createTopics(){
+    TopicCreation.createTopics(configuration.getAllTopics(), configuration.getKafkaServer());
 
   }
 
