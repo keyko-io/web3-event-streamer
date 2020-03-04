@@ -5,11 +5,11 @@ import com.typesafe.config.Config;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 
 public class StreamerConfig {
 
   private static final String KAFKA_BOOTSTRAP_SERVER = "kafka.bootstrap-server";
+  private static final String KAFKA_CREATE_TOPICS = "kafka.create-topics";
   private static final String SCHEMA_REGISTRY_URL = "schema-registry.url";
   private static final String EVENT_TOPIC = "kafka.topics.event-topic";
   private static final String VIEW_TOPIC = "kafka.topics.view-topic";
@@ -20,6 +20,7 @@ public class StreamerConfig {
   private static final String ALL_TOPICS = "kafka.topics";
 
   private String kafkaServer;
+  private Boolean kafkaCreateTopics;
   private String schemaRegistryUrl;
   private String eventTopic;
   private String viewTopic;
@@ -33,6 +34,7 @@ public class StreamerConfig {
   public StreamerConfig(Config config) {
 
     this.setKafkaServer(config.getString(KAFKA_BOOTSTRAP_SERVER));
+    this.setKafkaCreateTopics(config.getBoolean(KAFKA_CREATE_TOPICS));
     this.setSchemaRegistryUrl(config.getString(SCHEMA_REGISTRY_URL));
     this.setEventTopic(config.getString(EVENT_TOPIC));
     this.setViewTopic(config.getString(VIEW_TOPIC));
@@ -49,6 +51,14 @@ public class StreamerConfig {
 
   public void setKafkaServer(String kafkaServer) {
     this.kafkaServer = kafkaServer;
+  }
+
+  public Boolean getKafkaCreateTopics() {
+    return kafkaCreateTopics;
+  }
+
+  public void setKafkaCreateTopics(Boolean kafkaCreateTopics) {
+    this.kafkaCreateTopics = kafkaCreateTopics;
   }
 
   public String getSchemaRegistryUrl() {
