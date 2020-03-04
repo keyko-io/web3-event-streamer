@@ -52,7 +52,7 @@ public abstract class BaseStreamManager {
 
   }
 
-  public void initStream() throws Exception{
+  public void initStream() throws Exception {
     if (configuration.getKafkaCreateTopics()) createTopics();
 
     KafkaStreams streams = createStreams();
@@ -62,7 +62,7 @@ public abstract class BaseStreamManager {
     streams.start();
     // Add shutdown hook to respond to SIGTERM and gracefully close Kafka Streams
     Runtime.getRuntime().addShutdownHook(new Thread(streams::close));
-
+    throw new Exception("Rewiew that the topics that your process is going to use are already created.");
   }
 
   protected void configureSerdes(String schemaRegistryUrl) {
@@ -84,11 +84,11 @@ public abstract class BaseStreamManager {
 
   }
 
-  private void createTopics(){
+  private void createTopics() {
     TopicCreation.createTopics(configuration.getAllTopics(), configuration.getKafkaServer());
   }
 
-  protected abstract void processStreams( KStream<String, EventRecord> eventStream, KStream<String, ViewRecord> viewStream,  KTable<String, BlockRecord> blockTable);
+  protected abstract void processStreams(KStream<String, EventRecord> eventStream, KStream<String, ViewRecord> viewStream, KTable<String, BlockRecord> blockTable);
 
 
 }
