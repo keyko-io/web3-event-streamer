@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.keyko.monitoring</groupId>
   <artifactId>web3-event-streamer</artifactId>
-  <version>0.1.5</version>
+  <version>0.1.6</version>
   <name>Web3 Monitoring Event Streamer</name>
   <url>https://github.com/keyko-io/web3-event-streamer</url>
   <inceptionYear>2019</inceptionYear>
@@ -112,6 +112,16 @@
       <groupId>io.keyko.monitoring</groupId>
       <artifactId>schemas</artifactId>
       <version>${keyko.schemas.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-jdk14</artifactId>
+      <version>1.7.25</version>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j12</artifactId>
+      <version>1.7.5</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
