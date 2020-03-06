@@ -1,6 +1,5 @@
 package io.keyko.monitoring.preprocessing;
 
-import io.keyko.monitoring.config.StreamerConfig;
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.AdminClientConfig;
 import org.apache.kafka.clients.admin.NewTopic;

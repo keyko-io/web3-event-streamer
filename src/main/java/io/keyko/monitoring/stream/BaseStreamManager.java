@@ -13,6 +13,7 @@ import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.StreamsConfig;
 import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.KTable;
+import org.apache.log4j.Logger;
 
 import java.util.Properties;
 
@@ -22,6 +23,7 @@ public abstract class BaseStreamManager {
   protected StreamsBuilder builder;
   private static final Integer DEFAULT_THREADS = 1;
   private static final Integer DEFAULT_REPLICATION_FACTOR = 1;
+  private Logger LOG = Logger.getLogger(BaseStreamManager.class);
 
 
   protected BaseStreamManager(StreamerConfig streamerConfig) {
@@ -62,7 +64,7 @@ public abstract class BaseStreamManager {
     streams.start();
     // Add shutdown hook to respond to SIGTERM and gracefully close Kafka Streams
     Runtime.getRuntime().addShutdownHook(new Thread(streams::close));
-    throw new Exception("Rewiew that the topics that your process is going to use are already created.");
+    LOG.warn("If your process stop just starting, review that the topics that your process is going to use are already created.");
   }
 
   protected void configureSerdes(String schemaRegistryUrl) {
