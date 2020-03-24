@@ -3,6 +3,7 @@ package io.keyko.monitoring.preprocessing;
 import io.keyko.monitoring.config.StreamerConfig;
 import io.keyko.monitoring.schemas.BlockRecord;
 import io.keyko.monitoring.schemas.EventRecord;
+import io.keyko.monitoring.schemas.LogRecord;
 import io.keyko.monitoring.schemas.ViewRecord;
 import io.keyko.monitoring.serde.Web3MonitoringSerdes;
 import org.apache.kafka.common.serialization.Serdes;
@@ -23,5 +24,9 @@ public class Input {
 
   public static KTable<String, BlockRecord> getBlockTable(StreamerConfig configuration, StreamsBuilder builder) {
     return builder.table(configuration.getBlockTopic(), Consumed.with(Serdes.String(), Web3MonitoringSerdes.getBlockSerde()));
+  }
+
+  public static KStream<String, LogRecord> getLogStream(StreamerConfig configuration, StreamsBuilder builder) {
+    return builder.stream(configuration.getLogTopic(), Consumed.with(Serdes.String(), Web3MonitoringSerdes.getLogSerde()));
   }
 }

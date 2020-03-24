@@ -5,6 +5,7 @@ import io.keyko.monitoring.preprocessing.Input;
 import io.keyko.monitoring.preprocessing.TopicCreation;
 import io.keyko.monitoring.schemas.BlockRecord;
 import io.keyko.monitoring.schemas.EventRecord;
+import io.keyko.monitoring.schemas.LogRecord;
 import io.keyko.monitoring.schemas.ViewRecord;
 import io.keyko.monitoring.serde.Web3MonitoringSerdes;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -19,7 +20,7 @@ import java.util.Properties;
 
 public abstract class BaseStreamManager {
 
-  private StreamerConfig configuration;
+  protected StreamerConfig configuration;
   protected StreamsBuilder builder;
   private static final Integer DEFAULT_THREADS = 1;
   private static final Integer DEFAULT_REPLICATION_FACTOR = 1;
@@ -34,8 +35,8 @@ public abstract class BaseStreamManager {
 
     Properties streamsConfiguration = new Properties();
 
-    streamsConfiguration.put(StreamsConfig.APPLICATION_ID_CONFIG, "web3monitoring-streamer");
-    streamsConfiguration.put(StreamsConfig.CLIENT_ID_CONFIG, "web3monitoring-streamer");
+    streamsConfiguration.put(StreamsConfig.APPLICATION_ID_CONFIG, "web3monitoring-streamer_2");
+    streamsConfiguration.put(StreamsConfig.CLIENT_ID_CONFIG, "web3monitoring-streamer_2");
     streamsConfiguration.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, this.configuration.getKafkaServer());
     streamsConfiguration.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
 
@@ -79,8 +80,10 @@ public abstract class BaseStreamManager {
     final KTable<String, BlockRecord> blockTable = Input.getBlockTable(configuration, builder);
     KStream<String, EventRecord> eventStream = Input.getEventStream(configuration, builder);
     KStream<String, ViewRecord> viewStream = Input.getViewStream(configuration, builder);
+    KStream<String, LogRecord> logStream = Input.getLogStream(configuration, builder);
 
-    processStreams(eventStream, viewStream, blockTable);
+
+    processStreams(eventStream, viewStream, logStream, blockTable);
 
     return new KafkaStreams(builder.build(), this.getStreamConfiguration());
 
@@ -90,7 +93,7 @@ public abstract class BaseStreamManager {
     TopicCreation.createTopics(configuration.getAllTopics(), configuration.getKafkaServer());
   }
 
-  protected abstract void processStreams(KStream<String, EventRecord> eventStream, KStream<String, ViewRecord> viewStream, KTable<String, BlockRecord> blockTable);
+  protected abstract void processStreams(KStream<String, EventRecord> eventStream, KStream<String, ViewRecord> viewStream, KStream<String, LogRecord> logStream, KTable<String, BlockRecord> blockTable);
 
 
 }

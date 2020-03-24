@@ -14,10 +14,14 @@ public class StreamerConfig {
   private static final String EVENT_TOPIC = "kafka.topics.event-topic";
   private static final String VIEW_TOPIC = "kafka.topics.view-topic";
   private static final String BLOCK_TOPIC = "kafka.topics.block-topic";
+  private static final String LOG_TOPIC = "kafka.topics.log-topic";
   private static final String EVENT_BLOCK_TOPIC = "kafka.topics.event-block-topic";
   private static final String FLAT_EVENT_TOPIC = "kafka.topics.flat-event-topic";
   private static final String ALERTS_TOPIC = "kafka.topics.alert-topic";
   private static final String ALL_TOPICS = "kafka.topics";
+  private static final String ETHERSCAN_URL = "etherscan.url";
+  private static final String ETHERSCAN_GET_CONTRACT = "etherscan.contract";
+  private static final String ETHERSCAN_APIKEY = "etherscan.apikey";
 
   private String kafkaServer;
   private Boolean kafkaCreateTopics;
@@ -25,10 +29,14 @@ public class StreamerConfig {
   private String eventTopic;
   private String viewTopic;
   private String blockTopic;
+  private String logTopic;
   private String eventBlockTopic;
   private String flatEventTopic;
   private String alertsTopic;
   private List<String> topicList;
+  private String etherscanUrl;
+  private String etherscanGetContract;
+  private String etherscanApikey;
 
 
   public StreamerConfig(Config config) {
@@ -39,10 +47,15 @@ public class StreamerConfig {
     this.setEventTopic(config.getString(EVENT_TOPIC));
     this.setViewTopic(config.getString(VIEW_TOPIC));
     this.setBlockTopic(config.getString(BLOCK_TOPIC));
+    this.setLogTopic(config.getString(LOG_TOPIC));
     this.setEventBlockTopic(config.getString(EVENT_BLOCK_TOPIC));
     this.setFlatEventTopic(config.getString(FLAT_EVENT_TOPIC));
     this.setAlertsTopic(config.getString(ALERTS_TOPIC));
     this.setAllTopics(config.getConfig(ALL_TOPICS).root().unwrapped().values());
+    this.setEtherscanUrl(config.getString(ETHERSCAN_URL));
+    this.setEtherscanGetContract(config.getString(ETHERSCAN_GET_CONTRACT));
+    this.setEtherscanApikey(config.getString(ETHERSCAN_APIKEY));
+
   }
 
   public String getKafkaServer() {
@@ -129,4 +142,35 @@ public class StreamerConfig {
     this.topicList = list;
   }
 
+  public String getEtherscanUrl() {
+    return etherscanUrl;
+  }
+
+  public void setEtherscanUrl(String etherscanUrl) {
+    this.etherscanUrl = etherscanUrl;
+  }
+
+  public String getEtherscanGetContract() {
+    return etherscanGetContract;
+  }
+
+  public void setEtherscanGetContract(String etherscanGetContract) {
+    this.etherscanGetContract = etherscanGetContract;
+  }
+
+  public String getEtherscanApikey() {
+    return etherscanApikey;
+  }
+
+  public void setEtherscanApikey(String etherscanApikey) {
+    this.etherscanApikey = etherscanApikey;
+  }
+
+  public String getLogTopic() {
+    return logTopic;
+  }
+
+  public void setLogTopic(String logTopic) {
+    this.logTopic = logTopic;
+  }
 }

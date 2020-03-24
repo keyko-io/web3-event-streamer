@@ -4,7 +4,6 @@ import io.keyko.monitoring.schemas.EventBlockRecord;
 import io.keyko.monitoring.schemas.TimeSeriesRecord;
 import io.keyko.monitoring.schemas.ViewBlockRecord;
 import io.keyko.monitoring.serde.Web3MonitoringSerdes;
-import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.Produced;
@@ -52,7 +51,7 @@ public class Output {
   public static void splitByTimeSeries(KStream<String, TimeSeriesRecord> ts, String suffix) {
     ts.to((key, value, recordContext) ->
         "w3m-".concat(value.getContractName().toLowerCase()).concat("-").concat(value.getMethodName().toLowerCase()).concat("_ts").concat(suffix),
-      Produced.with(Serdes.String(), Web3MonitoringSerdes.getTimeSerieserde())
+      Produced.with(Serdes.String(), Web3MonitoringSerdes.getTimeSeriesSerde())
     );
   }
 

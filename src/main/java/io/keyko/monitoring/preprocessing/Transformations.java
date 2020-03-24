@@ -2,7 +2,9 @@ package io.keyko.monitoring.preprocessing;
 
 import io.keyko.monitoring.schemas.*;
 import io.keyko.monitoring.serde.Web3MonitoringSerdes;
+import io.keyko.monitoring.services.EventLogService;
 import org.apache.kafka.common.serialization.Serdes;
+import org.apache.kafka.streams.KeyValue;
 import org.apache.kafka.streams.kstream.Joined;
 import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.KTable;
@@ -175,4 +177,25 @@ public class Transformations {
 
     });
   }
+
+  public static  KStream<String, EventRecord> transformLogToEvent (KStream<String, LogRecord> logStream,  String getContractAbiUrl, String apiKey) {
+
+    return logStream.map(
+      (key, logRecord) -> {
+        EventRecord eventFromLog = null;
+        // TODO Handle Exception
+        try {
+          eventFromLog = EventLogService.getEventFromLog(logRecord, getContractAbiUrl, apiKey);
+        } catch (Exception e) {
+          e.printStackTrace();
+        }
+        return KeyValue.pair(eventFromLog.getId(), eventFromLog);
+      }
+
+    );
+
+
+  }
+
+
 }
