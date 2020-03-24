@@ -31,12 +31,12 @@ public abstract class BaseStreamManager {
     this.configuration = streamerConfig;
   }
 
-  private Properties getStreamConfiguration() {
+  private Properties getStreamConfiguration(String applicationId) {
 
     Properties streamsConfiguration = new Properties();
 
-    streamsConfiguration.put(StreamsConfig.APPLICATION_ID_CONFIG, "web3monitoring-streamer_2");
-    streamsConfiguration.put(StreamsConfig.CLIENT_ID_CONFIG, "web3monitoring-streamer_2");
+    streamsConfiguration.put(StreamsConfig.APPLICATION_ID_CONFIG, applicationId);
+    streamsConfiguration.put(StreamsConfig.CLIENT_ID_CONFIG, applicationId);
     streamsConfiguration.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, this.configuration.getKafkaServer());
     streamsConfiguration.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
 
@@ -85,7 +85,7 @@ public abstract class BaseStreamManager {
 
     processStreams(eventStream, viewStream, logStream, blockTable);
 
-    return new KafkaStreams(builder.build(), this.getStreamConfiguration());
+    return new KafkaStreams(builder.build(), this.getStreamConfiguration(configuration.getApplicationId()));
 
   }
 

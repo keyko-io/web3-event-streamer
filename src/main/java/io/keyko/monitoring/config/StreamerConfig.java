@@ -8,6 +8,7 @@ import java.util.List;
 
 public class StreamerConfig {
 
+  private static final String APPLICATIONID = "applicationId";
   private static final String KAFKA_BOOTSTRAP_SERVER = "kafka.bootstrap-server";
   private static final String KAFKA_CREATE_TOPICS = "kafka.create-topics";
   private static final String SCHEMA_REGISTRY_URL = "schema-registry.url";
@@ -23,6 +24,7 @@ public class StreamerConfig {
   private static final String ETHERSCAN_GET_CONTRACT = "etherscan.contract";
   private static final String ETHERSCAN_APIKEY = "etherscan.apikey";
 
+  private String applicationId;
   private String kafkaServer;
   private Boolean kafkaCreateTopics;
   private String schemaRegistryUrl;
@@ -41,6 +43,7 @@ public class StreamerConfig {
 
   public StreamerConfig(Config config) {
 
+    this.setApplicationId(config.getString(APPLICATIONID));
     this.setKafkaServer(config.getString(KAFKA_BOOTSTRAP_SERVER));
     this.setKafkaCreateTopics(config.getBoolean(KAFKA_CREATE_TOPICS));
     this.setSchemaRegistryUrl(config.getString(SCHEMA_REGISTRY_URL));
@@ -172,5 +175,13 @@ public class StreamerConfig {
 
   public void setLogTopic(String logTopic) {
     this.logTopic = logTopic;
+  }
+
+  public String getApplicationId() {
+    return applicationId;
+  }
+
+  public void setApplicationId(String applicationId) {
+    this.applicationId = applicationId;
   }
 }
