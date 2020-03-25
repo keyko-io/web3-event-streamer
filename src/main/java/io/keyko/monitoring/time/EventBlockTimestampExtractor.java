@@ -11,7 +11,7 @@ public class EventBlockTimestampExtractor implements TimestampExtractor {
     if (record != null && record.value() != null) {
 
       if (record.value() instanceof EventBlockRecord) {
-        return ((EventBlockRecord) record.value()).getDetailsBlock().getTimestamp();
+        return ((EventBlockRecord) record.value()).getBlock().getTimestamp();
       }
 
     }

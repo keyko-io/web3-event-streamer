@@ -38,7 +38,7 @@ public class CeloProcessor {
 
     KTable<Windowed<String>, Long> accountsCreatedDayTable =
       accountsCreatedStream
-        .selectKey((key, event) -> event.getDetails().getName())
+        .selectKey((key, event) -> event.getEvent().getName())
         .groupByKey(Grouped.with(Serdes.String(), CeloSerdes.getEventBlockSerde()))
         //.windowedBy(new DailyTimeWindows(zone, windowStartHour, gracePeriod))
         .windowedBy(TimeWindows.of(Duration.ofSeconds(60)))
@@ -90,15 +90,15 @@ public class CeloProcessor {
 
   public static KStream<String, AlertRecord> alertNoEpochRewardsDistributed(StreamsBuilder builder, List<String> EpochRewardsDistributedToVoters) {
     return builder.stream(EpochRewardsDistributedToVoters, Consumed.with(Serdes.String(), CeloSerdes.getEventBlockSerde()))
-      .filter((key, event) -> ((NumberParameter) event.getDetails().getNonIndexedParameters().get(0)).getValue().equals("0"))
+      .filter((key, event) -> ((NumberParameter) event.getEvent().getNonIndexedParameters().get(0)).getValue().equals("0"))
       .map((key, event) ->
         KeyValue.pair(key,
           AlertRecord.newBuilder()
             .setName("alertNoEpochRewardsDistributed")
             .setReference(event.getId())
             .setStatus(AlertEventStatus.ERROR)
-            .setTimestamp(event.getDetailsBlock().getTimestamp())
-            .setDescription("NoEpochRewardsDistributed for group: " + ((StringParameter) event.getDetails().getIndexedParameters().get(0)).getValue())
+            .setTimestamp(event.getBlock().getTimestamp())
+            .setDescription("NoEpochRewardsDistributed for group: " + ((StringParameter) event.getEvent().getIndexedParameters().get(0)).getValue())
             .build())
       );
 //      .to("w3m-alerts");

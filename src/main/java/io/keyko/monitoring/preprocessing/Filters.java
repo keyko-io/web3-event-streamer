@@ -7,6 +7,6 @@ public class Filters {
 
   public static KStream<String, EventRecord> filterConfirmed(KStream<String, EventRecord> contractEvents) {
     return contractEvents
-      .filter((key, event) -> event.getDetails().getStatus().toString().equalsIgnoreCase("CONFIRMED"));
+      .filter((key, event) -> event.getStatus().toString().equalsIgnoreCase("CONFIRMED"));
   }
 }
