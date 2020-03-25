@@ -186,7 +186,7 @@ public class Transformations {
 
     return logStream.flatMapValues(
       logRecord -> {
-        EventRecord eventFromLog = null;
+        EventRecord eventFromLog;
 
         // TODO Handle Exception
         try {
