@@ -20,17 +20,14 @@ public class Transformations {
    */
   public static KStream<String, EventBlockRecord> joinEventWithBlock(KStream<String, EventRecord> eventStream, KTable<String, BlockRecord> blockStream) {
     return eventStream
-      .selectKey((key, event) -> event.getDetails().getBlockHash())
+      .selectKey((key, event) -> event.getBlockHash())
       .join(blockStream,
         (event, block) -> {
           EventBlockRecord eventblock = new EventBlockRecord();
-
-          eventblock.setDetails(event.getDetails());
-          eventblock.setDetailsBlock(block.getDetails());
+          eventblock.setEvent(event);
+          eventblock.setBlock(block);
           eventblock.setId(event.getId());
           eventblock.setRetries(event.getRetries());
-          eventblock.setType(event.getType());
-
           return eventblock;
         },
         Joined.with(Serdes.String(), Web3MonitoringSerdes.getEventSerde(), Web3MonitoringSerdes.getBlockSerde())
@@ -48,16 +45,14 @@ public class Transformations {
 
   public static KStream<String, ViewBlockRecord> joinViewWithBlock(KStream<String, ViewRecord> viewStream, KTable<String, BlockRecord> blockStream) {
     return viewStream
-      .selectKey((key, view) -> view.getDetails().getBlockHash())
+      .selectKey((key, view) -> view.getBlockHash())
       .join(blockStream,
         (view, block) -> {
           ViewBlockRecord viewBlock = new ViewBlockRecord();
-
-          viewBlock.setDetails(view.getDetails());
-          viewBlock.setDetailsBlock(block.getDetails());
           viewBlock.setId(view.getId());
           viewBlock.setRetries(view.getRetries());
-          viewBlock.setType(view.getType());
+          viewBlock.setBlock(block);
+          viewBlock.setView(view);
           return viewBlock;
         },
         Joined.with(Serdes.String(), Web3MonitoringSerdes.getViewSerde(), Web3MonitoringSerdes.getBlockSerde())
@@ -77,13 +72,13 @@ public class Transformations {
 
     return stream.mapValues(viewBlock -> {
 
-      List<Object> output = viewBlock.getDetails().getOutput();
+      List<Object> output = viewBlock.getView().getOutput();
 
       TimeSeriesRecord timeSeries = new TimeSeriesRecord();
-      timeSeries.setContractName(viewBlock.getDetails().getContractName());
-      timeSeries.setMethodName(viewBlock.getDetails().getName());
-      timeSeries.setTimestamp(viewBlock.getDetailsBlock().getTimestamp());
-      timeSeries.setBlockNumber(viewBlock.getDetailsBlock().getNumber());
+      timeSeries.setContractName(viewBlock.getView().getContractName());
+      timeSeries.setMethodName(viewBlock.getView().getName());
+      timeSeries.setTimestamp(viewBlock.getBlock().getTimestamp());
+      timeSeries.setBlockNumber(viewBlock.getBlock().getNumber());
 
       for (int i = 0; i < output.size(); i++) {
 
@@ -131,14 +126,14 @@ public class Transformations {
   public static KStream<String, TimeSeriesRecord> transformEventToTimeSeries(KStream<String, EventBlockRecord> stream) {
     return stream.mapValues(eventBlock -> {
 
-      List<Object> output = eventBlock.getDetails().getIndexedParameters();
-      output.addAll(eventBlock.getDetails().getNonIndexedParameters());
+      List<Object> output = eventBlock.getEvent().getIndexedParameters();
+      output.addAll(eventBlock.getEvent().getNonIndexedParameters());
 
       TimeSeriesRecord timeSeries = new TimeSeriesRecord();
-      timeSeries.setContractName(eventBlock.getDetails().getContractName());
-      timeSeries.setMethodName(eventBlock.getDetails().getName());
-      timeSeries.setTimestamp(eventBlock.getDetailsBlock().getTimestamp());
-      timeSeries.setBlockNumber(eventBlock.getDetailsBlock().getNumber());
+      timeSeries.setContractName(eventBlock.getEvent().getContractName());
+      timeSeries.setMethodName(eventBlock.getEvent().getName());
+      timeSeries.setTimestamp(eventBlock.getBlock().getTimestamp());
+      timeSeries.setBlockNumber(eventBlock.getBlock().getNumber());
 
       for (int i = 0; i < output.size(); i++) {
 
