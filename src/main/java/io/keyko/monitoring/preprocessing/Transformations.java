@@ -1,14 +1,18 @@
 package io.keyko.monitoring.preprocessing;
 
+import io.keyko.monitoring.exceptions.EventFromLogException;
 import io.keyko.monitoring.schemas.*;
 import io.keyko.monitoring.serde.Web3MonitoringSerdes;
 import io.keyko.monitoring.services.EventLogService;
+import io.keyko.monitoring.services.KafkaProducerService;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.KeyValue;
 import org.apache.kafka.streams.kstream.Joined;
 import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.KTable;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class Transformations {
@@ -178,24 +182,31 @@ public class Transformations {
     });
   }
 
-  public static  KStream<String, EventRecord> transformLogToEvent (KStream<String, LogRecord> logStream,  String getContractAbiUrl, String apiKey) {
+  public static  KStream<String, EventRecord> transformLogToEvent (KStream<String, LogRecord> logStream,  String getContractAbiUrl, String apiKey, Boolean sendErrorsToTopic, String errorTopic) {
 
-    return logStream.map(
-      (key, logRecord) -> {
+    return logStream.flatMapValues(
+      logRecord -> {
         EventRecord eventFromLog = null;
+
         // TODO Handle Exception
         try {
           eventFromLog = EventLogService.getEventFromLog(logRecord, getContractAbiUrl, apiKey);
-        } catch (Exception e) {
-          e.printStackTrace();
+          return Arrays.asList(eventFromLog);
+        } catch (EventFromLogException e) {
+          if (sendErrorsToTopic)
+             KafkaProducerService.send(errorTopic, logRecord.getId(), logRecord);
         }
-        return KeyValue.pair(eventFromLog.getId(), eventFromLog);
+
+        return Collections.EMPTY_LIST;
       }
-
     );
-
 
   }
 
+  public static  KStream<String, EventRecord> transformLogToEvent (KStream<String, LogRecord> logStream,  String getContractAbiUrl, String apiKey) {
+    return transformLogToEvent(logStream, getContractAbiUrl, apiKey, false, null);
+  }
 
-}
+
+
+  }

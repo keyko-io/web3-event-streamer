@@ -8,6 +8,7 @@ import io.keyko.monitoring.schemas.EventRecord;
 import io.keyko.monitoring.schemas.LogRecord;
 import io.keyko.monitoring.schemas.ViewRecord;
 import io.keyko.monitoring.serde.Web3MonitoringSerdes;
+import io.keyko.monitoring.services.KafkaProducerService;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StreamsBuilder;
@@ -57,6 +58,9 @@ public abstract class BaseStreamManager {
 
   public void initStream() throws Exception {
     if (configuration.getKafkaCreateTopics()) createTopics();
+
+    if (configuration.getEtherscanSendNotMatchToTopic())
+      KafkaProducerService.init(configuration.getKafkaServer(), configuration.getSchemaRegistryUrl());
 
     KafkaStreams streams = createStreams();
 

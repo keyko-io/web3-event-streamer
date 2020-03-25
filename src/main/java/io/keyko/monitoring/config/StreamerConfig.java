@@ -23,6 +23,8 @@ public class StreamerConfig {
   private static final String ETHERSCAN_URL = "etherscan.url";
   private static final String ETHERSCAN_GET_CONTRACT = "etherscan.contract";
   private static final String ETHERSCAN_APIKEY = "etherscan.apikey";
+  private static final String LOG_NOT_MATCH_ERROR_TOPIC = "kafka.topics.log-etherscan-not-match-topic";
+  private static final String ETHERSCAN_SEND_NOT_MATCH_TO_TOPIC = "etherscan.sendNotMatchToTopic";
 
   private String applicationId;
   private String kafkaServer;
@@ -39,6 +41,8 @@ public class StreamerConfig {
   private String etherscanUrl;
   private String etherscanGetContract;
   private String etherscanApikey;
+  private String logNotMatchErrorTopic;
+  private Boolean etherscanSendNotMatchToTopic;
 
 
   public StreamerConfig(Config config) {
@@ -58,6 +62,8 @@ public class StreamerConfig {
     this.setEtherscanUrl(config.getString(ETHERSCAN_URL));
     this.setEtherscanGetContract(config.getString(ETHERSCAN_GET_CONTRACT));
     this.setEtherscanApikey(config.getString(ETHERSCAN_APIKEY));
+    this.setLogNotMatchErrorTopic(config.getString(LOG_NOT_MATCH_ERROR_TOPIC));
+    this.setEtherscanSendNotMatchToTopic(config.getBoolean(ETHERSCAN_SEND_NOT_MATCH_TO_TOPIC));
 
   }
 
@@ -183,5 +189,21 @@ public class StreamerConfig {
 
   public void setApplicationId(String applicationId) {
     this.applicationId = applicationId;
+  }
+
+  public String getLogNotMatchErrorTopic() {
+    return logNotMatchErrorTopic;
+  }
+
+  public void setLogNotMatchErrorTopic(String logNotMatchErrorTopic) {
+    this.logNotMatchErrorTopic = logNotMatchErrorTopic;
+  }
+
+  public Boolean getEtherscanSendNotMatchToTopic() {
+    return etherscanSendNotMatchToTopic;
+  }
+
+  public void setEtherscanSendNotMatchToTopic(Boolean etherscanSendNotMatchToTopic) {
+    this.etherscanSendNotMatchToTopic = etherscanSendNotMatchToTopic;
   }
 }

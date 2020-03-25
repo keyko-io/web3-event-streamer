@@ -30,7 +30,12 @@ public class BasicStreamManager extends BaseStreamManager {
     String contractAbiParams = configuration.getEtherscanGetContract();
     String url = ethScan.concat(contractAbiParams);
 
-    KStream<String, EventRecord> eventFromLogStream = Transformations.transformLogToEvent(logStream, url, configuration.getEtherscanApikey());
+    KStream<String, EventRecord> eventFromLogStream = Transformations.transformLogToEvent(logStream,
+                                                                          url,
+                                                                          configuration.getEtherscanApikey(),
+                                                                          configuration.getEtherscanSendNotMatchToTopic(),
+                                                                          configuration.getLogNotMatchErrorTopic());
+
     eventFromLogStream.to("w3m-events-from-log", Produced.with(Serdes.String(), Web3MonitoringSerdes.getEventSerde()));
 
     KStream<String, EventRecord> eventLogStream = builder.stream("w3m-events-from-log", Consumed.with(Serdes.String(), Web3MonitoringSerdes.getEventSerde()));

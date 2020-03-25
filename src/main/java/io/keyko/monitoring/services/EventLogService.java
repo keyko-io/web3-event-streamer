@@ -1,5 +1,8 @@
 package io.keyko.monitoring.services;
 
+import io.keyko.monitoring.exceptions.AbiNotFoundException;
+import io.keyko.monitoring.exceptions.EtherscanException;
+import io.keyko.monitoring.exceptions.EventFromLogException;
 import io.keyko.monitoring.model.ContractData;
 import io.keyko.monitoring.schemas.*;
 import org.apache.log4j.Logger;
@@ -19,17 +22,41 @@ public class EventLogService {
 
   private static Logger log = Logger.getLogger(EventLogService.class);
 
-  public static EventRecord getEventFromLog(LogRecord log, String getContractAbiUrl, String apiKey) throws Exception {
+  public static EventRecord getEventFromLog(LogRecord log, String getContractAbiUrl, String apiKey) throws EventFromLogException {
 
     String contractAddress = log.getDetails().getAddress();
-    ContractData contractData = EtherscanService.getContractData(getContractAbiUrl, contractAddress, apiKey);
+    ContractData contractData = null;
+
+    try {
+      contractData = EtherscanService.getContractData(getContractAbiUrl, contractAddress, apiKey);
+    } catch (EtherscanException e) {
+        throw new EventFromLogException("Error getting the data from Contract", e);
+    }
+
     List<AbiDefinition> eventsAbiDefinition = getAbiDefinitionByType("event", contractData.getAbiDefinitionList());
 
-    AbiDefinition eventAbi = getEventAbi(log, eventsAbiDefinition);
+    AbiDefinition eventAbi = null;
+    try {
+      eventAbi = getEventAbi(log, eventsAbiDefinition);
+    } catch (AbiNotFoundException e) {
+        throw new EventFromLogException("Error getting the ABI Definition for the event", e);
+    }
+
     Event event = getEventFromAbi(eventAbi);
 
     List<Type> indexed = getIndexedParametersFromLog(event, log);
     List<Type> nonIndexed = getNonIndexedParametersFromLog(event, log);
+
+    return generateEventRecord(contractData.getName(),
+                                                  event.getName(),
+                                                  getEventHashFromAbi(eventAbi),
+                                                  web3ToMonitoringType(indexed, eventAbi, true),
+                                                  web3ToMonitoringType(nonIndexed, eventAbi, false),
+                                                  log);
+  }
+
+
+  private static EventRecord generateEventRecord(String contractName, String eventName, String eventHash, List<Object> indexedParameters, List<Object> nonIndexedParameters, LogRecord log){
 
     EventRecord eventRecord = new EventRecord();
     eventRecord.setType("CONTRACT_EVENT");
@@ -37,26 +64,27 @@ public class EventLogService {
     eventRecord.setId(log.getDetails().getId());
 
     EventDetailsRecord eventDetails = new EventDetailsRecord();
-    eventDetails.setContractName(contractData.getName());
+    eventDetails.setContractName(contractName);
     eventDetails.setBlockNumber(log.getDetails().getBlockNumber());
     eventDetails.setId(log.getDetails().getId());
-    eventDetails.setName(event.getName());
+    eventDetails.setName(eventName);
     eventDetails.setStatus(ContractEventStatus.CONFIRMED); // ??
     eventDetails.setBlockHash(log.getDetails().getBlockHash());
     eventDetails.setAddress(log.getDetails().getAddress());
-    eventDetails.setEventSpecificationSignature(getEventHashFromAbi(eventAbi));
-    eventDetails.setFilterId(event.getName());
+    eventDetails.setEventSpecificationSignature(eventHash);
+    eventDetails.setFilterId(eventName);
     eventDetails.setLogIndex(log.getDetails().getLogIndex());
     eventDetails.setNetworkName(log.getDetails().getNetworkName());
     eventDetails.setNodeName(log.getDetails().getNodeName());
     eventDetails.setTransactionHash(log.getDetails().getTransactionHash());
 
-    eventDetails.setIndexedParameters(web3ToMonitoringType(indexed, eventAbi, true));
-    eventDetails.setNonIndexedParameters(web3ToMonitoringType(nonIndexed, eventAbi, false));
+    eventDetails.setIndexedParameters(indexedParameters);
+    eventDetails.setNonIndexedParameters(nonIndexedParameters);
 
     eventRecord.setDetails(eventDetails);
 
     return eventRecord;
+
   }
 
   private static List<Object> web3ToMonitoringType(List<Type> parameters,  AbiDefinition eventAbi, Boolean indexed) {
@@ -105,18 +133,29 @@ public class EventLogService {
   }
 
 
-  private static String getEventHashFromAbi(AbiDefinition eventAbi) throws Exception {
+  private static String getEventHashFromAbi(AbiDefinition eventAbi) throws EventFromLogException {
     return EventEncoder.encode(getEventFromAbi(eventAbi));
   }
 
-  public static Event getEventFromAbi(AbiDefinition eventAbi) throws Exception{
+  public static Event getEventFromAbi(AbiDefinition eventAbi) throws EventFromLogException {
 
     List<AbiDefinition.NamedType> params = eventAbi.getInputs();
     List<org.web3j.abi.TypeReference<?>> typeReferences = new ArrayList<>();
 
     for(AbiDefinition.NamedType param: params){
 
-      org.web3j.abi.TypeReference type = org.web3j.abi.TypeReference.makeTypeReference(param.getType(), param.isIndexed(), false);
+      org.web3j.abi.TypeReference type = null;
+
+      try {
+
+        type = org.web3j.abi.TypeReference.makeTypeReference(param.getType(), param.isIndexed(), false);
+
+      } catch (ClassNotFoundException e) {
+        String message = "Error making type reference";
+        log.error(message + " "+ e.getMessage());
+        throw new EventFromLogException(message, e);
+      }
+
       typeReferences.add(type);
 
     }
@@ -125,11 +164,11 @@ public class EventLogService {
 
   }
 
-  public static AbiDefinition getEventAbi(LogRecord log, List<AbiDefinition> eventsAbiDefinition ) {
+  public static AbiDefinition getEventAbi(LogRecord log, List<AbiDefinition> eventsAbiDefinition ) throws AbiNotFoundException{
 
     String eventLogHash = log.getDetails().getTopics().get(0).toString();
 
-    return eventsAbiDefinition
+    AbiDefinition abiDefinition = eventsAbiDefinition
       .stream()
       .filter( eventAbi ->
       {
@@ -144,6 +183,11 @@ public class EventLogService {
       })
       .findFirst()
       .orElse(null);
+
+    if (abiDefinition==null)
+      throw new AbiNotFoundException("The ABI for event " + eventLogHash + "was not found in the current ABI Definition ");
+
+    return abiDefinition;
 
   }
 
