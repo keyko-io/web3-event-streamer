@@ -38,21 +38,12 @@ public class BasicStreamManager extends BaseStreamManager {
 
     eventFromLogStream.to("w3m-events-from-log", Produced.with(Serdes.String(), Web3MonitoringSerdes.getEventSerde()));
 
-    KStream<String, EventRecord> eventLogStream = builder.stream("w3m-events-from-log", Consumed.with(Serdes.String(), Web3MonitoringSerdes.getEventSerde()));
-    eventFromLogStream.foreach( (key, value) -> {
-      System.out.println("value id :" + value.getId());
-      System.out.println("value type :" + value.getType());
-    });
-
-    /*
     final KStream<String, EventRecord> eventAvroStream = Filters.filterConfirmed(eventStream);
     KStream<String, EventBlockRecord> eventBlockStream = Transformations.joinEventWithBlock(eventAvroStream, blockTable);
     Output.splitByEvent(eventBlockStream);
 
     KStream<String, ViewBlockRecord> viewBlockStream = Transformations.joinViewWithBlock(viewStream, blockTable);
     Output.splitByView(viewBlockStream);
-
-     */
 
   }
 

@@ -24,7 +24,7 @@ public class EventLogService {
 
   public static EventRecord getEventFromLog(LogRecord log, String getContractAbiUrl, String apiKey) throws EventFromLogException {
 
-    String contractAddress = log.getDetails().getAddress();
+    String contractAddress = log.getAddress();
     ContractData contractData = null;
 
     try {
@@ -56,32 +56,40 @@ public class EventLogService {
   }
 
 
+
+  private static ContractEventStatus getEventStatus(LogStatus logStatus){
+    switch(logStatus){
+      case CONFIRMED: return ContractEventStatus.CONFIRMED;
+      case UNCONFIRMED: return ContractEventStatus.UNCONFIRMED;
+      case INVALIDATED: return ContractEventStatus.INVALIDATED;
+    }
+
+    return ContractEventStatus.UNCONFIRMED;
+  }
+
   private static EventRecord generateEventRecord(String contractName, String eventName, String eventHash, List<Object> indexedParameters, List<Object> nonIndexedParameters, LogRecord log){
 
     EventRecord eventRecord = new EventRecord();
-    eventRecord.setType("CONTRACT_EVENT");
     eventRecord.setRetries(log.getRetries());
-    eventRecord.setId(log.getDetails().getId());
+    eventRecord.setId(log.getId());
 
-    EventDetailsRecord eventDetails = new EventDetailsRecord();
-    eventDetails.setContractName(contractName);
-    eventDetails.setBlockNumber(log.getDetails().getBlockNumber());
-    eventDetails.setId(log.getDetails().getId());
-    eventDetails.setName(eventName);
-    eventDetails.setStatus(ContractEventStatus.CONFIRMED); // ??
-    eventDetails.setBlockHash(log.getDetails().getBlockHash());
-    eventDetails.setAddress(log.getDetails().getAddress());
-    eventDetails.setEventSpecificationSignature(eventHash);
-    eventDetails.setFilterId(eventName);
-    eventDetails.setLogIndex(log.getDetails().getLogIndex());
-    eventDetails.setNetworkName(log.getDetails().getNetworkName());
-    eventDetails.setNodeName(log.getDetails().getNodeName());
-    eventDetails.setTransactionHash(log.getDetails().getTransactionHash());
+    eventRecord.setContractName(contractName);
+    eventRecord.setBlockNumber(log.getBlockNumber());
+    eventRecord.setId(log.getId());
+    eventRecord.setName(eventName);
+    eventRecord.setStatus(getEventStatus(log.getStatus()));
+    eventRecord.setBlockHash(log.getBlockHash());
+    eventRecord.setAddress(log.getAddress());
+    eventRecord.setEventSpecificationSignature(eventHash);
+    eventRecord.setFilterId(eventName);
+    eventRecord.setLogIndex(log.getLogIndex());
+    eventRecord.setNetworkName(log.getNetworkName());
+    eventRecord.setNodeName(log.getNodeName());
+    eventRecord.setTransactionHash(log.getTransactionHash());
 
-    eventDetails.setIndexedParameters(indexedParameters);
-    eventDetails.setNonIndexedParameters(nonIndexedParameters);
+    eventRecord.setIndexedParameters(indexedParameters);
+    eventRecord.setNonIndexedParameters(nonIndexedParameters);
 
-    eventRecord.setDetails(eventDetails);
 
     return eventRecord;
 
@@ -115,7 +123,7 @@ public class EventLogService {
     }
 
     return FunctionReturnDecoder.decode(
-      log.getDetails().getData(), event.getNonIndexedParameters());
+      log.getData(), event.getNonIndexedParameters());
   }
 
   private static List<Type> getIndexedParametersFromLog(Event event, LogRecord log) {
@@ -124,7 +132,7 @@ public class EventLogService {
       return Collections.EMPTY_LIST;
     }
 
-    List<String> topics =  log.getDetails().getTopics().stream().map( o -> o.toString()).collect(Collectors.toList());
+    List<String> topics =  log.getTopics().stream().map( o -> o.toString()).collect(Collectors.toList());
     final List<String> encodedParameters = topics.subList(1, topics.size());
 
     return IntStream.range(0, encodedParameters.size())
@@ -166,7 +174,7 @@ public class EventLogService {
 
   public static AbiDefinition getEventAbi(LogRecord log, List<AbiDefinition> eventsAbiDefinition ) throws AbiNotFoundException{
 
-    String eventLogHash = log.getDetails().getTopics().get(0).toString();
+    String eventLogHash = log.getTopics().get(0);
 
     AbiDefinition abiDefinition = eventsAbiDefinition
       .stream()
