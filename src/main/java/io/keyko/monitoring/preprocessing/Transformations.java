@@ -201,6 +201,41 @@ public class Transformations {
     return transformLogToEvent(logStream, getContractAbiUrl, apiKey, false, null);
   }
 
+  public static KStream<String, LogRecordTopicsFlattened> flatLogs(KStream<String, LogRecord> logRecordKStream) {
+    return logRecordKStream.mapValues(message -> {
+        String topic0 = "";
+        String topic1 = "";
+        String topic2 = "";
+        String topic3 = "";
+        if (message.getTopics().size() > 0)
+          topic0 = message.getTopics().get(0);
+        if (message.getTopics().size() > 1)
+          topic1 = message.getTopics().get(1);
+        if (message.getTopics().size() > 2)
+          topic2 = message.getTopics().get(2);
+        if (message.getTopics().size() > 3)
+          topic3 = message.getTopics().get(3);
+        return LogRecordTopicsFlattened.newBuilder()
+          .setBlockHash(message.getBlockHash())
+          .setLogIndex(message.getLogIndex())
+          .setBlockNumber(message.getBlockNumber())
+          .setAddress(message.getAddress())
+          .setTransactionHash(message.getTransactionHash())
+          .setTopic0(topic0)
+          .setTopic1(topic1)
+          .setTopic2(topic2)
+          .setTopic3(topic3)
+          .setNodeName(message.getNodeName())
+          .setData(message.getData())
+          .setNetworkName(message.getNetworkName())
+          .setStatus(LogFlattenedStatus.valueOf(message.getStatus().name()))
+          .setId(message.getId())
+          .setRetries(message.getRetries())
+          .build();
 
+      }
+    );
+
+  }
 
   }
