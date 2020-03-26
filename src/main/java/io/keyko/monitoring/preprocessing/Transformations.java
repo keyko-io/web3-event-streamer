@@ -6,13 +6,12 @@ import io.keyko.monitoring.serde.Web3MonitoringSerdes;
 import io.keyko.monitoring.services.EventLogService;
 import io.keyko.monitoring.services.KafkaProducerService;
 import org.apache.kafka.common.serialization.Serdes;
-import org.apache.kafka.streams.KeyValue;
 import org.apache.kafka.streams.kstream.Joined;
 import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.KTable;
 
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 public class Transformations {
@@ -197,7 +196,7 @@ public class Transformations {
              KafkaProducerService.send(errorTopic, logRecord.getId(), logRecord);
         }
 
-        return Collections.EMPTY_LIST;
+        return new ArrayList<>();
       }
     );
 
