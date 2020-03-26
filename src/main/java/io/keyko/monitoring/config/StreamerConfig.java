@@ -8,7 +8,7 @@ import java.util.List;
 
 public class StreamerConfig {
 
-  private static final String APPLICATIONID = "applicationId";
+  private static final String APPLICATION_ID = "applicationId";
   private static final String KAFKA_BOOTSTRAP_SERVER = "kafka.bootstrap-server";
   private static final String KAFKA_CREATE_TOPICS = "kafka.create-topics";
   private static final String SCHEMA_REGISTRY_URL = "schema-registry.url";
@@ -47,7 +47,7 @@ public class StreamerConfig {
 
   public StreamerConfig(Config config) {
 
-    this.setApplicationId(config.getString(APPLICATIONID));
+    this.setApplicationId(config.getString(APPLICATION_ID));
     this.setKafkaServer(config.getString(KAFKA_BOOTSTRAP_SERVER));
     this.setKafkaCreateTopics(config.getBoolean(KAFKA_CREATE_TOPICS));
     this.setSchemaRegistryUrl(config.getString(SCHEMA_REGISTRY_URL));
