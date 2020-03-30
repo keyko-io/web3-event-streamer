@@ -1,6 +1,7 @@
 package io.keyko.monitoring.stream;
 
 import io.keyko.monitoring.cache.CacheManagerProvider;
+import io.keyko.monitoring.cache.InfinispanCacheProvider;
 import io.keyko.monitoring.config.StreamerConfig;
 import io.keyko.monitoring.preprocessing.Input;
 import io.keyko.monitoring.preprocessing.TopicCreation;
@@ -65,12 +66,16 @@ public abstract class BaseStreamManager {
     if (configuration.getEtherscanSendNotMatchToTopic())
       KafkaProducerService.init(configuration.getKafkaServer(), configuration.getSchemaRegistryUrl());
 
+    /*
     try {
       CacheManagerProvider.initCacheManagerService("cache-serialization.xml", TimeUnit.HOURS, configuration.getCacheExpiryTime());
     } catch (URISyntaxException e) {
      log.error("Error initializing the CacheManager " + e.getMessage());
      throw e;
     }
+*/
+
+    InfinispanCacheProvider.initCacheManagerService(TimeUnit.HOURS, configuration.getCacheExpiryTime());
 
     KafkaStreams streams = createStreams();
 
@@ -78,7 +83,15 @@ public abstract class BaseStreamManager {
     // start processing
     streams.start();
     // Add shutdown hook to respond to SIGTERM and gracefully close Kafka Streams
-    Runtime.getRuntime().addShutdownHook(new Thread(streams::close));
+    Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+      try {
+        streams.close();
+        InfinispanCacheProvider.finishCacheManager();
+      } catch (Exception e) {
+        // ignored
+      }
+    }));
+
     log.warn("If your process stop just starting, review that the topics that your process is going to use are already created.");
   }
 

@@ -3,7 +3,7 @@ package io.keyko.monitoring.services;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.keyko.monitoring.cache.CacheManagerProvider;
+import io.keyko.monitoring.cache.InfinispanCacheProvider;
 import io.keyko.monitoring.exceptions.EtherscanException;
 import io.keyko.monitoring.helpers.HttpHelper;
 import io.keyko.monitoring.helpers.HttpResponse;
@@ -12,9 +12,9 @@ import io.keyko.monitoring.model.ContractData;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.text.StringSubstitutor;
 import org.apache.log4j.Logger;
+import org.infinispan.Cache;
 import org.web3j.protocol.core.methods.response.AbiDefinition;
 
-import javax.cache.Cache;
 import java.io.IOException;
 import java.util.*;
 
@@ -22,7 +22,7 @@ public class EtherscanService {
 
   private static Logger log = Logger.getLogger(EtherscanService.class);
   private static ObjectMapper mapper = new ObjectMapper();
-  private static Cache<String, ContractCacheData> cache = CacheManagerProvider.getCache("etherscanContract", ContractCacheData.class);
+  private static Cache<String, ContractCacheData> cache = InfinispanCacheProvider.getCache("etherscanContract", ContractCacheData.class);
 
 
   public static ContractData getContractData(String getContractAbiUrl, String contractAddress, String apiKey) throws EtherscanException {

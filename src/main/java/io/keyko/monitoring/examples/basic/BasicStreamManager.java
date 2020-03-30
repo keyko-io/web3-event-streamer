@@ -2,17 +2,23 @@ package io.keyko.monitoring.examples.basic;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
+import io.keyko.monitoring.cache.InfinispanCacheProvider;
 import io.keyko.monitoring.config.StreamerConfig;
+import io.keyko.monitoring.exceptions.EtherscanException;
+import io.keyko.monitoring.model.ContractData;
 import io.keyko.monitoring.postprocessing.Output;
 import io.keyko.monitoring.preprocessing.Filters;
 import io.keyko.monitoring.preprocessing.Transformations;
 import io.keyko.monitoring.serde.Web3MonitoringSerdes;
 import io.keyko.monitoring.schemas.*;
+import io.keyko.monitoring.services.EtherscanService;
 import io.keyko.monitoring.stream.BaseStreamManager;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.KTable;
 import org.apache.kafka.streams.kstream.Produced;
+
+import java.util.concurrent.TimeUnit;
 
 
 public class BasicStreamManager extends BaseStreamManager {
@@ -43,6 +49,7 @@ public class BasicStreamManager extends BaseStreamManager {
 
     KStream<String, ViewBlockRecord> viewBlockStream = Transformations.joinViewWithBlock(viewStream, blockTable);
     Output.splitByView(viewBlockStream);
+
 
   }
 
