@@ -2,9 +2,10 @@ package io.keyko.monitoring.model;
 
 import org.web3j.protocol.core.methods.response.AbiDefinition;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class ContractData {
+public class ContractData implements Serializable {
 
   private String name;
   private List<AbiDefinition> abiDefinitionList;

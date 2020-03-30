@@ -25,6 +25,9 @@ public class StreamerConfig {
   private static final String ETHERSCAN_APIKEY = "etherscan.apikey";
   private static final String LOG_NOT_MATCH_ERROR_TOPIC = "kafka.topics.log-etherscan-not-match-topic";
   private static final String ETHERSCAN_SEND_NOT_MATCH_TO_TOPIC = "etherscan.sendNotMatchToTopic";
+  private static final String CACHE_ACTIVE = "etherscan.cache.active";
+  private static final String CACHE_EXPIRY_TIME = "etherscan.cache.expiry-time";
+  private static final String CACHE_SERIALIZATION_XML_PATH = "etherscan.cache.serialization-xml-path";
 
   private String applicationId;
   private String kafkaServer;
@@ -43,6 +46,9 @@ public class StreamerConfig {
   private String etherscanApikey;
   private String logNotMatchErrorTopic;
   private Boolean etherscanSendNotMatchToTopic;
+  private Boolean cacheActive;
+  private Integer cacheExpiryTime;
+  private String cacheSerializationXmlPath;
 
 
   public StreamerConfig(Config config) {
@@ -64,6 +70,9 @@ public class StreamerConfig {
     this.setEtherscanApikey(config.getString(ETHERSCAN_APIKEY));
     this.setLogNotMatchErrorTopic(config.getString(LOG_NOT_MATCH_ERROR_TOPIC));
     this.setEtherscanSendNotMatchToTopic(config.getBoolean(ETHERSCAN_SEND_NOT_MATCH_TO_TOPIC));
+    this.setCacheActive(config.getBoolean(CACHE_ACTIVE));
+    this.setCacheExpiryTime(config.getInt(CACHE_EXPIRY_TIME));
+    this.setCacheSerializationXmlPath(config.getString(CACHE_SERIALIZATION_XML_PATH));
 
   }
 
@@ -205,5 +214,29 @@ public class StreamerConfig {
 
   public void setEtherscanSendNotMatchToTopic(Boolean etherscanSendNotMatchToTopic) {
     this.etherscanSendNotMatchToTopic = etherscanSendNotMatchToTopic;
+  }
+
+  public Boolean getCacheActive() {
+    return cacheActive;
+  }
+
+  public void setCacheActive(Boolean cacheActive) {
+    this.cacheActive = cacheActive;
+  }
+
+  public Integer getCacheExpiryTime() {
+    return cacheExpiryTime;
+  }
+
+  public void setCacheExpiryTime(Integer cacheExpiryTime) {
+    this.cacheExpiryTime = cacheExpiryTime;
+  }
+
+  public String getCacheSerializationXmlPath() {
+    return cacheSerializationXmlPath;
+  }
+
+  public void setCacheSerializationXmlPath(String cacheSerializationXmlPath) {
+    this.cacheSerializationXmlPath = cacheSerializationXmlPath;
   }
 }
