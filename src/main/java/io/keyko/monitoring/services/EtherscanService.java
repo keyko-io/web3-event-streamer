@@ -23,6 +23,7 @@ public class EtherscanService {
   private static Logger log = Logger.getLogger(EtherscanService.class);
   private static ObjectMapper mapper = new ObjectMapper();
   private static Cache<String, ContractCacheData> cache = InfinispanCacheProvider.getCache("etherscanContract", ContractCacheData.class);
+  private static Boolean cacheEnabled = InfinispanCacheProvider.isCacheEnabled();
 
 
   public static ContractData getContractData(String getContractAbiUrl, String contractAddress, String apiKey) throws EtherscanException {
@@ -31,7 +32,7 @@ public class EtherscanService {
     String abiString;
     String contractName;
 
-    if (cache.containsKey(contractAddress)){
+    if (cacheEnabled && cache.containsKey(contractAddress)){
       log.debug("Getting data from cache for addres: " + contractAddress);
       ContractCacheData cacheData = cache.get(contractAddress);
       abiString = cacheData.getRawAbi();
@@ -53,7 +54,7 @@ public class EtherscanService {
       throw new EtherscanException(message, e);
     }
 
-    if (!cache.containsKey(contractAddress)){
+    if (cacheEnabled && !cache.containsKey(contractAddress)){
       cache.put(contractAddress, new ContractCacheData(contractName, abiString));
     }
 

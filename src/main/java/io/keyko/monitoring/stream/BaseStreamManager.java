@@ -1,6 +1,5 @@
 package io.keyko.monitoring.stream;
 
-import io.keyko.monitoring.cache.CacheManagerProvider;
 import io.keyko.monitoring.cache.InfinispanCacheProvider;
 import io.keyko.monitoring.config.StreamerConfig;
 import io.keyko.monitoring.preprocessing.Input;
@@ -19,7 +18,6 @@ import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.KTable;
 import org.apache.log4j.Logger;
 
-import java.net.URISyntaxException;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
@@ -66,16 +64,13 @@ public abstract class BaseStreamManager {
     if (configuration.getEtherscanSendNotMatchToTopic())
       KafkaProducerService.init(configuration.getKafkaServer(), configuration.getSchemaRegistryUrl());
 
-    /*
-    try {
-      CacheManagerProvider.initCacheManagerService("cache-serialization.xml", TimeUnit.HOURS, configuration.getCacheExpiryTime());
-    } catch (URISyntaxException e) {
-     log.error("Error initializing the CacheManager " + e.getMessage());
-     throw e;
-    }
-*/
-
-    InfinispanCacheProvider.initCacheManagerService(TimeUnit.HOURS, configuration.getCacheExpiryTime());
+    InfinispanCacheProvider.initCacheManagerService(
+      configuration.getCacheEnabled(),
+      TimeUnit.HOURS,
+      configuration.getCacheExpiryTime(),
+      configuration.getCacheUseMongodb(),
+      configuration.getCacheMongodbUrl(),
+      configuration.getCacheInMemoryMaxSize());
 
     KafkaStreams streams = createStreams();
 
