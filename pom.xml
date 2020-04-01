@@ -74,12 +74,6 @@
     </dependency>
     <dependency>
       <groupId>org.infinispan</groupId>
-      <artifactId>infinispan-persistence-parent</artifactId>
-      <version>9.4.0.Final</version>
-      <type>pom</type>
-    </dependency>
-    <dependency>
-      <groupId>org.infinispan</groupId>
       <artifactId>infinispan-cachestore-mongodb</artifactId>
       <version>9.4.0.Final</version>
     </dependency>
