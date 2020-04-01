@@ -25,6 +25,11 @@ public class StreamerConfig {
   private static final String ETHERSCAN_APIKEY = "etherscan.apikey";
   private static final String LOG_NOT_MATCH_ERROR_TOPIC = "kafka.topics.log-etherscan-not-match-topic";
   private static final String ETHERSCAN_SEND_NOT_MATCH_TO_TOPIC = "etherscan.sendNotMatchToTopic";
+  private static final String CACHE_ENABLED = "etherscan.cache.enabled";
+  private static final String CACHE_EXPIRY_TIME = "etherscan.cache.expiry-time";
+  private static final String CACHE_USE_MONGODB = "etherscan.cache.use-mongodb-store";
+  private static final String CACHE_MONGODB_URL = "etherscan.cache.mongodb-url";
+  private static final String CACHE_INMEMORY_MAX_SIZE = "etherscan.cache.in_memory_max_size";
 
   private String applicationId;
   private String kafkaServer;
@@ -43,6 +48,11 @@ public class StreamerConfig {
   private String etherscanApikey;
   private String logNotMatchErrorTopic;
   private Boolean etherscanSendNotMatchToTopic;
+  private Boolean cacheEnabled;
+  private Integer cacheExpiryTime;
+  private Boolean cacheUseMongodb;
+  private String cacheMongodbUrl;
+  private Long cacheInMemoryMaxSize;
 
 
   public StreamerConfig(Config config) {
@@ -59,11 +69,17 @@ public class StreamerConfig {
     this.setFlatEventTopic(config.getString(FLAT_EVENT_TOPIC));
     this.setAlertsTopic(config.getString(ALERTS_TOPIC));
     this.setAllTopics(config.getConfig(ALL_TOPICS).root().unwrapped().values());
-    this.setEtherscanUrl(config.getString(ETHERSCAN_URL));
-    this.setEtherscanGetContract(config.getString(ETHERSCAN_GET_CONTRACT));
-    this.setEtherscanApikey(config.getString(ETHERSCAN_APIKEY));
-    this.setLogNotMatchErrorTopic(config.getString(LOG_NOT_MATCH_ERROR_TOPIC));
-    this.setEtherscanSendNotMatchToTopic(config.getBoolean(ETHERSCAN_SEND_NOT_MATCH_TO_TOPIC));
+
+    this.setEtherscanUrl(config.hasPath(ETHERSCAN_URL) ? config.getString(ETHERSCAN_URL): "");
+    this.setEtherscanGetContract(config.hasPath(ETHERSCAN_GET_CONTRACT)?config.getString(ETHERSCAN_GET_CONTRACT):"");
+    this.setEtherscanApikey(config.hasPath(ETHERSCAN_APIKEY)?config.getString(ETHERSCAN_APIKEY):"");
+    this.setLogNotMatchErrorTopic(config.hasPath(LOG_NOT_MATCH_ERROR_TOPIC)?config.getString(LOG_NOT_MATCH_ERROR_TOPIC):"");
+    this.setEtherscanSendNotMatchToTopic(config.hasPath(ETHERSCAN_SEND_NOT_MATCH_TO_TOPIC)?config.getBoolean(ETHERSCAN_SEND_NOT_MATCH_TO_TOPIC):false);
+    this.setCacheEnabled(config.hasPath(CACHE_ENABLED)?config.getBoolean(CACHE_ENABLED):false);
+    this.setCacheExpiryTime(config.hasPath(CACHE_EXPIRY_TIME)?config.getInt(CACHE_EXPIRY_TIME):24);
+    this.setCacheUseMongodb(config.hasPath(CACHE_USE_MONGODB)?config.getBoolean(CACHE_USE_MONGODB):false);
+    this.setCacheMongodbUrl(config.hasPath(CACHE_MONGODB_URL)?config.getString(CACHE_MONGODB_URL):"");
+    this.setCacheInMemoryMaxSize(config.hasPath(CACHE_INMEMORY_MAX_SIZE)?config.getLong(CACHE_INMEMORY_MAX_SIZE):0l);
 
   }
 
@@ -205,5 +221,45 @@ public class StreamerConfig {
 
   public void setEtherscanSendNotMatchToTopic(Boolean etherscanSendNotMatchToTopic) {
     this.etherscanSendNotMatchToTopic = etherscanSendNotMatchToTopic;
+  }
+
+  public Boolean getCacheEnabled() {
+    return cacheEnabled;
+  }
+
+  public void setCacheEnabled(Boolean cacheEnabled) {
+    this.cacheEnabled = cacheEnabled;
+  }
+
+  public Integer getCacheExpiryTime() {
+    return cacheExpiryTime;
+  }
+
+  public void setCacheExpiryTime(Integer cacheExpiryTime) {
+    this.cacheExpiryTime = cacheExpiryTime;
+  }
+
+  public Boolean getCacheUseMongodb() {
+    return cacheUseMongodb;
+  }
+
+  public void setCacheUseMongodb(Boolean cacheUseMongodb) {
+    this.cacheUseMongodb = cacheUseMongodb;
+  }
+
+  public String getCacheMongodbUrl() {
+    return cacheMongodbUrl;
+  }
+
+  public void setCacheMongodbUrl(String cacheMongodbUrl) {
+    this.cacheMongodbUrl = cacheMongodbUrl;
+  }
+
+  public Long getCacheInMemoryMaxSize() {
+    return cacheInMemoryMaxSize;
+  }
+
+  public void setCacheInMemoryMaxSize(Long cacheInMemoryMaxSize) {
+    this.cacheInMemoryMaxSize = cacheInMemoryMaxSize;
   }
 }

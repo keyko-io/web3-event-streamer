@@ -1,5 +1,6 @@
 package io.keyko.monitoring.stream;
 
+import io.keyko.monitoring.cache.InfinispanCacheProvider;
 import io.keyko.monitoring.config.StreamerConfig;
 import io.keyko.monitoring.preprocessing.Input;
 import io.keyko.monitoring.preprocessing.TopicCreation;
@@ -18,6 +19,7 @@ import org.apache.kafka.streams.kstream.KTable;
 import org.apache.log4j.Logger;
 
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 
 public abstract class BaseStreamManager {
 
@@ -25,7 +27,7 @@ public abstract class BaseStreamManager {
   protected StreamsBuilder builder;
   private static final Integer DEFAULT_THREADS = 1;
   private static final Integer DEFAULT_REPLICATION_FACTOR = 1;
-  private Logger LOG = Logger.getLogger(BaseStreamManager.class);
+  private Logger log = Logger.getLogger(BaseStreamManager.class);
 
 
   protected BaseStreamManager(StreamerConfig streamerConfig) {
@@ -62,14 +64,30 @@ public abstract class BaseStreamManager {
     if (configuration.getEtherscanSendNotMatchToTopic())
       KafkaProducerService.init(configuration.getKafkaServer(), configuration.getSchemaRegistryUrl());
 
+    InfinispanCacheProvider.initCacheManagerService(
+      configuration.getCacheEnabled(),
+      TimeUnit.HOURS,
+      configuration.getCacheExpiryTime(),
+      configuration.getCacheUseMongodb(),
+      configuration.getCacheMongodbUrl(),
+      configuration.getCacheInMemoryMaxSize());
+
     KafkaStreams streams = createStreams();
 
     streams.cleanUp();
     // start processing
     streams.start();
     // Add shutdown hook to respond to SIGTERM and gracefully close Kafka Streams
-    Runtime.getRuntime().addShutdownHook(new Thread(streams::close));
-    LOG.warn("If your process stop just starting, review that the topics that your process is going to use are already created.");
+    Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+      try {
+        streams.close();
+        InfinispanCacheProvider.finishCacheManager();
+      } catch (Exception e) {
+        // ignored
+      }
+    }));
+
+    log.warn("If your process stop just starting, review that the topics that your process is going to use are already created.");
   }
 
   protected void configureSerdes(String schemaRegistryUrl) {
