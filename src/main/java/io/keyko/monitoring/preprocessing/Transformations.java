@@ -9,12 +9,15 @@ import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.kstream.Joined;
 import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.KTable;
+import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public class Transformations {
+
+  private static Logger log = Logger.getLogger(Transformations.class);
 
   /**
    * Join the events with the corresponding block to track the timestamp of mining.
@@ -184,11 +187,16 @@ public class Transformations {
 
         // TODO Handle Exception
         try {
+          log.debug("Getting eventRecord from LogRecord..");
           eventFromLog = EventLogService.getEventFromLog(logRecord, getContractAbiUrl, apiKey);
+          log.debug("Get eventRecord from LogRecord OK!");
           return Arrays.asList(eventFromLog);
         } catch (EventFromLogException e) {
-          if (sendErrorsToTopic)
-             KafkaProducerService.send(errorTopic, logRecord.getId(), logRecord);
+          log.debug("Error getting eventRecord from logRecord: " + e.getMessage());
+          if (sendErrorsToTopic){
+            log.debug("Sending logRecord to error topic in Kakfa");
+            KafkaProducerService.send(errorTopic, logRecord.getId(), logRecord);
+          }
         }
 
         return new ArrayList<>();

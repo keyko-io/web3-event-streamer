@@ -35,8 +35,9 @@ public class BasicStreamManager extends BaseStreamManager {
                                                                           configuration.getEtherscanSendNotMatchToTopic(),
                                                                           configuration.getLogNotMatchErrorTopic());
 
-    eventFromLogStream.to("w3m-events-from-log", Produced.with(Serdes.String(), Web3MonitoringSerdes.getEventSerde()));
+   // eventFromLogStream.to("w3m-events-from-log", Produced.with(Serdes.String(), Web3MonitoringSerdes.getEventSerde()));
 
+    eventFromLogStream.to(configuration.getEventTopic(), Produced.with(Serdes.String(), Web3MonitoringSerdes.getEventSerde()));
     final KStream<String, EventRecord> eventAvroStream = Filters.filterConfirmed(eventStream);
     KStream<String, EventBlockRecord> eventBlockStream = Transformations.joinEventWithBlock(eventAvroStream, blockTable);
     Output.splitByEvent(eventBlockStream);

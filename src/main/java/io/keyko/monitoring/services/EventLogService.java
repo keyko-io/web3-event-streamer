@@ -67,31 +67,77 @@ public class EventLogService {
     return ContractEventStatus.UNCONFIRMED;
   }
 
-  private static EventRecord generateEventRecord(String contractName, String eventName, String eventHash, List<Object> indexedParameters, List<Object> nonIndexedParameters, LogRecord log){
+  private static EventRecord generateEventRecord(String contractName, String eventName, String eventHash, List<Object> indexedParameters, List<Object> nonIndexedParameters, LogRecord logRecord){
 
     EventRecord eventRecord = new EventRecord();
-    eventRecord.setRetries(log.getRetries());
-    eventRecord.setId(log.getId());
+    eventRecord.setRetries(logRecord.getRetries());
+    eventRecord.setId(logRecord.getId());
 
     eventRecord.setContractName(contractName);
-    eventRecord.setBlockNumber(log.getBlockNumber());
-    eventRecord.setId(log.getId());
+    eventRecord.setBlockNumber(logRecord.getBlockNumber());
     eventRecord.setName(eventName);
-    eventRecord.setStatus(getEventStatus(log.getStatus()));
-    eventRecord.setBlockHash(log.getBlockHash());
-    eventRecord.setAddress(log.getAddress());
+    eventRecord.setStatus(getEventStatus(logRecord.getStatus()));
+    eventRecord.setBlockHash(logRecord.getBlockHash());
+    eventRecord.setAddress(logRecord.getAddress());
     eventRecord.setEventSpecificationSignature(eventHash);
     eventRecord.setFilterId(eventName);
-    eventRecord.setLogIndex(log.getLogIndex());
-    eventRecord.setNetworkName(log.getNetworkName());
-    eventRecord.setNodeName(log.getNodeName());
-    eventRecord.setTransactionHash(log.getTransactionHash());
+    eventRecord.setLogIndex(logRecord.getLogIndex());
+    eventRecord.setNetworkName(logRecord.getNetworkName());
+    eventRecord.setNodeName(logRecord.getNodeName());
+    eventRecord.setTransactionHash(logRecord.getTransactionHash());
 
     eventRecord.setIndexedParameters(indexedParameters);
     eventRecord.setNonIndexedParameters(nonIndexedParameters);
 
+    if (log.isDebugEnabled())
+      printEventRecord(eventRecord);
 
     return eventRecord;
+
+  }
+
+  private static void printEventRecord(EventRecord eventRecord){
+
+    log.debug("Generated EventRecord: ");
+    log.debug("ID: " + eventRecord.getId());
+    log.debug("Contract name: " + eventRecord.getContractName());
+    log.debug("Block number : " + eventRecord.getBlockNumber());
+    log.debug("Name: " + eventRecord.getName());
+    log.debug("Status: " + eventRecord.getStatus());
+    log.debug("Block haash : " + eventRecord.getBlockHash());
+    log.debug("Address: " + eventRecord.getAddress());
+    log.debug("EventSpecificationSignature: " + eventRecord.getEventSpecificationSignature());
+    log.debug("FilterId: " + eventRecord.getFilterId());
+    log.debug("LogIndex: " + eventRecord.getLogIndex());
+    log.debug("NetworkName: " + eventRecord.getNetworkName());
+    log.debug("NodeName: " + eventRecord.getNodeName());
+    log.debug("TransactionHash: " + eventRecord.getTransactionHash());
+
+    log.debug("Indexed Parameters: ");
+    printParameters(eventRecord.getIndexedParameters());
+
+    log.debug("Non Indexed Parameters: ");
+    printParameters(eventRecord.getNonIndexedParameters());
+
+  }
+
+  private static void printParameters(List<Object> parameters){
+
+    for(Object o:parameters){
+      if (o instanceof NumberParameter) {
+        NumberParameter np = (NumberParameter) o;
+        log.debug("Parameter Name: " + np.getName());
+        log.debug("Parameter Type: " +  np.getType());
+        log.debug("Parameter Value: " + np.getValue());
+        log.debug("Parameter Number Value: " + np.getNumberValue());
+      }
+      else if (o instanceof StringParameter) {
+        StringParameter sp = (StringParameter) o;
+        log.debug("Parameter Name: " + sp.getName());
+        log.debug("Parameter Type: " +  sp.getType());
+        log.debug("Parameter Value: " + sp.getValue());
+      }
+    }
 
   }
 
