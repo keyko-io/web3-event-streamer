@@ -3,6 +3,7 @@ package io.keyko.monitoring.services;
 import io.keyko.monitoring.exceptions.AbiNotFoundException;
 import io.keyko.monitoring.exceptions.EtherscanException;
 import io.keyko.monitoring.exceptions.EventFromLogException;
+import io.keyko.monitoring.exceptions.TypeConversionException;
 import io.keyko.monitoring.model.ContractData;
 import io.keyko.monitoring.schemas.*;
 import org.apache.log4j.Logger;
@@ -22,7 +23,7 @@ public class EventLogService {
 
   private static Logger log = Logger.getLogger(EventLogService.class);
 
-  public static EventRecord getEventFromLog(LogRecord log, String getContractAbiUrl, String apiKey) throws EventFromLogException {
+  public static EventRecord getEventFromLog(LogRecord log, String getContractAbiUrl, String apiKey) throws EventFromLogException, TypeConversionException {
 
     String contractAddress = log.getAddress();
     ContractData contractData = null;
@@ -141,7 +142,7 @@ public class EventLogService {
 
   }
 
-  private static List<Object> web3ToMonitoringType(List<Type> parameters,  AbiDefinition eventAbi, Boolean indexed) {
+  private static List<Object> web3ToMonitoringType(List<Type> parameters,  AbiDefinition eventAbi, Boolean indexed) throws TypeConversionException {
 
     List<Object> monitoringParameters = new ArrayList<>();
 

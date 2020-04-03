@@ -1,5 +1,6 @@
 package io.keyko.monitoring.services;
 
+import io.keyko.monitoring.exceptions.TypeConversionException;
 import io.keyko.monitoring.schemas.NumberParameter;
 import io.keyko.monitoring.schemas.StringParameter;
 import org.web3j.abi.datatypes.Type;
@@ -11,7 +12,7 @@ import java.math.BigInteger;
 public class Web3ParameterConverter {
 
 
-  public static Object convertWeb3Type(Type parameter, String name) {
+  public static Object convertWeb3Type(Type parameter, String name) throws TypeConversionException {
 
     String parameterType = parameter.getTypeAsString();
 
@@ -26,10 +27,15 @@ public class Web3ParameterConverter {
       return new NumberParameter(name, parameterType, value.toString(), truncateToLong(value));
     }
 
+    if (parameterType.equals("bool")) {
+      BigInteger value = (Boolean) parameter.getValue() ? BigInteger.ONE : BigInteger.ZERO;
+      return new NumberParameter(name, parameterType, value.toString(), truncateToLong(value));
+    }
+
     if (parameterType.startsWith("bytes"))
       return new StringParameter(name, parameterType, trim(Numeric.toHexString((byte[]) parameter.getValue())));
 
-    return null;
+    throw new TypeConversionException("Unsupported type: " + parameterType);
 
   }
 

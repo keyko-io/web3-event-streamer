@@ -1,6 +1,7 @@
 package io.keyko.monitoring.preprocessing;
 
 import io.keyko.monitoring.exceptions.EventFromLogException;
+import io.keyko.monitoring.exceptions.TypeConversionException;
 import io.keyko.monitoring.schemas.*;
 import io.keyko.monitoring.serde.Web3MonitoringSerdes;
 import io.keyko.monitoring.services.EventLogService;
@@ -191,7 +192,7 @@ public class Transformations {
           eventFromLog = EventLogService.getEventFromLog(logRecord, getContractAbiUrl, apiKey);
           log.debug("Get eventRecord from LogRecord OK!");
           return Arrays.asList(eventFromLog);
-        } catch (EventFromLogException e) {
+        } catch (EventFromLogException| TypeConversionException e) {
           log.debug("Error getting eventRecord from logRecord: " + e.getMessage());
           if (sendErrorsToTopic){
             log.debug("Sending logRecord to error topic in Kakfa");
