@@ -16,6 +16,10 @@ public class Web3ParameterConverter {
 
     String parameterType = parameter.getTypeAsString();
 
+    if (parameterType.contains("["))
+      throw new TypeConversionException("Arrays not supported: " + parameterType);
+
+
     if (parameterType.equals("address"))
       return new StringParameter(name, parameterType, Keys.toChecksumAddress(parameter.toString()));
 
