@@ -12,6 +12,8 @@ import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.KTable;
 import org.apache.log4j.Logger;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -245,6 +247,101 @@ public class Transformations {
       }
     );
 
+  }
+
+  public static KStream<String, FlatEventBlockRecord> flatEventBlockRecord(KStream<String, EventBlockRecord> eventBlockStream) {
+
+    return eventBlockStream.mapValues( eventBlock -> {
+
+      FlatEventBlockRecord flatEventBlockRecord = new FlatEventBlockRecord();
+
+      flatEventBlockRecord.setAddress(eventBlock.getEvent().getAddress());
+      flatEventBlockRecord.setBlockHash(eventBlock.getEvent().getBlockHash());
+      flatEventBlockRecord.setBlockNumber(eventBlock.getEvent().getBlockNumber());
+      flatEventBlockRecord.setContractName(eventBlock.getEvent().getContractName());
+      flatEventBlockRecord.setEventSpecificationSignature(eventBlock.getEvent().getEventSpecificationSignature());
+      flatEventBlockRecord.setFilterId(eventBlock.getEvent().getFilterId());
+      flatEventBlockRecord.setId(eventBlock.getEvent().getId());
+      flatEventBlockRecord.setLogIndex(eventBlock.getEvent().getLogIndex());
+      flatEventBlockRecord.setName(eventBlock.getEvent().getName());
+      flatEventBlockRecord.setNetworkName(eventBlock.getEvent().getNetworkName());
+      flatEventBlockRecord.setNodeName(eventBlock.getEvent().getNodeName());
+      flatEventBlockRecord.setRetries(eventBlock.getEvent().getRetries());
+      flatEventBlockRecord.setStatus(getEventStatus(eventBlock.getEvent().getStatus()));
+      flatEventBlockRecord.setTimestamp(eventBlock.getBlock().getTimestamp());
+
+      List<Object> indexedParameteres = eventBlock.getEvent().getIndexedParameters();
+      List<Object> nonIndexedParameteres = eventBlock.getEvent().getNonIndexedParameters();
+
+      setParametersOfFlatEvent(flatEventBlockRecord, indexedParameteres, true);
+      setParametersOfFlatEvent(flatEventBlockRecord, nonIndexedParameteres, false);
+
+      return flatEventBlockRecord;
+
+    });
+
+  }
+
+  private static void setParametersOfFlatEvent(FlatEventBlockRecord flatEvent, List<Object> parameters, Boolean indexed)  {
+
+
+    Integer maxIndexParameters = 4;
+    Integer maxNonIndexParameters = 5;
+
+    Integer max = indexed?maxIndexParameters:maxNonIndexParameters;
+
+    String nameMethod = indexed?"setIndexedParamName":"setNonIndexedParamName";
+    String typeMethod = indexed?"setIndexedParamType":"setNonIndexedParamType";
+    String valueMethod = indexed?"setIndexedParamValue":"setNonIndexedParamValue";
+
+    Method setNameMethod;
+    Method setTypeMethod;
+    Method setValueMethod;
+
+    String paramName = "";
+    String paramType = "";
+    String paramValue = "";
+
+    for (int i=0; i< parameters.size() && i< max; i++){
+
+      try {
+        setNameMethod = FlatEventBlockRecord.class.getMethod(nameMethod + i, String.class);
+        setTypeMethod = FlatEventBlockRecord.class.getMethod(typeMethod + i, String.class);
+        setValueMethod = FlatEventBlockRecord.class.getMethod(valueMethod + i, String.class);
+
+        if (parameters.get(i) instanceof NumberParameter) {
+          NumberParameter nParam = (NumberParameter) parameters.get(i);
+          paramName = nParam.getName();
+          paramType = nParam.getType();
+          paramValue = nParam.getValue();
+        } else {
+          StringParameter sParam = (StringParameter) parameters.get(i);
+          paramName = sParam.getName();
+          paramType = sParam.getType();
+          paramValue = sParam.getValue();
+        }
+
+        setNameMethod.invoke(flatEvent, paramName);
+        setTypeMethod.invoke(flatEvent, paramType);
+        setValueMethod.invoke(flatEvent, paramValue);
+
+      }catch (Exception e){
+        log.error("Error setting parameter " + e.getMessage());
+        continue;
+      }
+
+    }
+
+  }
+
+  private static FlatContractEventBlockStatus getEventStatus(ContractEventStatus status){
+    switch(status){
+      case CONFIRMED: return FlatContractEventBlockStatus.CONFIRMED;
+      case UNCONFIRMED: return FlatContractEventBlockStatus.UNCONFIRMED;
+      case INVALIDATED: return FlatContractEventBlockStatus.INVALIDATED;
+    }
+
+    return FlatContractEventBlockStatus.UNCONFIRMED;
   }
 
   }
