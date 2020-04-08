@@ -268,6 +268,7 @@ public class Transformations {
       flatEventBlockRecord.setNodeName(eventBlock.getEvent().getNodeName());
       flatEventBlockRecord.setRetries(eventBlock.getEvent().getRetries());
       flatEventBlockRecord.setStatus(getEventStatus(eventBlock.getEvent().getStatus()));
+      flatEventBlockRecord.setTransactionHash(eventBlock.getEvent().getTransactionHash());
       flatEventBlockRecord.setTimestamp(eventBlock.getBlock().getTimestamp());
 
       List<Object> indexedParameteres = eventBlock.getEvent().getIndexedParameters();
