@@ -268,38 +268,8 @@ public class Transformations {
       flatEventBlockRecord.setNodeName(eventBlock.getEvent().getNodeName());
       flatEventBlockRecord.setRetries(eventBlock.getEvent().getRetries());
       flatEventBlockRecord.setStatus(getEventStatus(eventBlock.getEvent().getStatus()));
+      flatEventBlockRecord.setTransactionHash(eventBlock.getEvent().getTransactionHash());
       flatEventBlockRecord.setTimestamp(eventBlock.getBlock().getTimestamp());
-
-
-      flatEventBlockRecord.setIndexedParamValue0("");
-      flatEventBlockRecord.setIndexedParamValue1("");
-      flatEventBlockRecord.setIndexedParamValue2("");
-      flatEventBlockRecord.setIndexedParamValue3("");
-      flatEventBlockRecord.setIndexedParamName0("");
-      flatEventBlockRecord.setIndexedParamName1("");
-      flatEventBlockRecord.setIndexedParamName2("");
-      flatEventBlockRecord.setIndexedParamName3("");
-      flatEventBlockRecord.setIndexedParamType0("");
-      flatEventBlockRecord.setIndexedParamType1("");
-      flatEventBlockRecord.setIndexedParamType2("");
-      flatEventBlockRecord.setIndexedParamType3("");
-
-      flatEventBlockRecord.setNonIndexedParamValue0("");
-      flatEventBlockRecord.setNonIndexedParamValue1("");
-      flatEventBlockRecord.setNonIndexedParamValue2("");
-      flatEventBlockRecord.setNonIndexedParamValue3("");
-      flatEventBlockRecord.setNonIndexedParamValue4("");
-      flatEventBlockRecord.setNonIndexedParamName0("");
-      flatEventBlockRecord.setNonIndexedParamName1("");
-      flatEventBlockRecord.setNonIndexedParamName2("");
-      flatEventBlockRecord.setNonIndexedParamName3("");
-      flatEventBlockRecord.setNonIndexedParamName4("");
-      flatEventBlockRecord.setNonIndexedParamType0("");
-      flatEventBlockRecord.setNonIndexedParamType1("");
-      flatEventBlockRecord.setNonIndexedParamType2("");
-      flatEventBlockRecord.setNonIndexedParamType3("");
-      flatEventBlockRecord.setNonIndexedParamType4("");
-
 
       List<Object> indexedParameteres = eventBlock.getEvent().getIndexedParameters();
       List<Object> nonIndexedParameteres = eventBlock.getEvent().getNonIndexedParameters();
