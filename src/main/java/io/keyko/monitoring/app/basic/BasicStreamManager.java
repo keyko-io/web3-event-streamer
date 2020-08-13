@@ -1,4 +1,4 @@
-package io.keyko.monitoring.examples.basic;
+package io.keyko.monitoring.app.basic;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;

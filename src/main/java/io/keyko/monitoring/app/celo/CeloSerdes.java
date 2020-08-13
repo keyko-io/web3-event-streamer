@@ -1,4 +1,4 @@
-package io.keyko.monitoring.examples.celo;
+package io.keyko.monitoring.app.celo;
 
 import io.confluent.kafka.streams.serdes.avro.SpecificAvroSerde;
 import io.keyko.monitoring.schemas.AlertRecord;

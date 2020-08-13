@@ -1,6 +1,6 @@
-package io.keyko.monitoring.examples.celo;
+package io.keyko.monitoring.app.celo;
 
-import io.keyko.monitoring.examples.celo.model.AccountCreatedAggregation;
+import io.keyko.monitoring.app.celo.model.AccountCreatedAggregation;
 import io.keyko.monitoring.schemas.*;
 import io.keyko.monitoring.time.EventBlockTimestampExtractor;
 import org.apache.kafka.common.serialization.Serdes;

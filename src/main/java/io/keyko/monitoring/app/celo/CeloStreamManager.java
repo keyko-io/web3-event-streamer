@@ -1,8 +1,8 @@
-package io.keyko.monitoring.examples.celo;
+package io.keyko.monitoring.app.celo;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
-import io.keyko.monitoring.examples.celo.model.AccountCreatedAggregation;
+import io.keyko.monitoring.app.celo.model.AccountCreatedAggregation;
 import io.keyko.monitoring.postprocessing.Output;
 import io.keyko.monitoring.preprocessing.Filters;
 import io.keyko.monitoring.preprocessing.Transformations;

@@ -1,4 +1,4 @@
-package io.keyko.monitoring.examples.celo;
+package io.keyko.monitoring.app.celo;
 
 import com.typesafe.config.Config;
 import io.keyko.monitoring.config.StreamerConfig;

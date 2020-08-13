@@ -1,4 +1,4 @@
-package io.keyko.monitoring.examples.celo.model;
+package io.keyko.monitoring.app.celo.model;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
